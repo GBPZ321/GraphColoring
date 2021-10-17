@@ -1,4 +1,4 @@
-Idea: 
+# Idea 
 
 Tabu search is a simple, yet powerful meta-heuristic based on local
 search that has been often used to solve combinatorial optimization problems like
@@ -9,8 +9,6 @@ The actual algorithm itself looks like it could be implemented fairly briefly so
 https://github.com/pchervi/Graph-Coloring/blob/master/Coloring_Tabucol.py
 
 ## Research Paper
-
-
 
 https://baldur.iti.kit.edu/theses/CooperativeTabucol.pdf
 

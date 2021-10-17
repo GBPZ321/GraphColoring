@@ -1,14 +1,14 @@
-#DIMACS 
+# DIMACS 
 
 The graphs are in the DIMACS format. Blow we give the introduction to the DIMACS format for undirected graphs, which are taken and slightly edited from http://dimacs.rutgers.edu/Challenges/.
 
 
-##Introduction
+## Introduction
 
 DIMACS (Center for Discrete Mathematics and Theoretical Computer Science) defined a format for undirected graph, which has been used as a standard format for problems in undirected graphs. This format was also chosen for several DIMACS Computational Challenges.
 
 
-##Input Files
+## Input Files
 
 An input file contains all the information about an undirected graph.
 
@@ -22,13 +22,13 @@ Files are assumed to be well-formed and internally consistent: node identifier v
 c This is an example of a comment line.
 
 
-###Problem line
+### Problem line
 There is one problem line per input file. The problem line must appear before any node or arc descriptor lines. The problem line has the following format. p FORMAT NODES EDGES
 
 The lower-case character p signifies that this is the problem line. The FORMAT field is for consistency with the previous Challenge, and should contain the word ``edge''. The NODES field contains an integer value specifying n, the number of nodes in the graph. The EDGES field contains an integer value specifying m, the number of edges in the graph.
 
 
-###Edge Descriptors
+### Edge Descriptors
  
 There is one edge descriptor line for each edge the graph, each with the following format. Each edge (u,v) appears exactly once in the input file and is not repeated as (u,v).
 
