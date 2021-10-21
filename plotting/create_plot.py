@@ -24,7 +24,7 @@ def plot(configuration):
 
 if __name__ == "__main__":
     dir_name = os.getcwd()
-    base_filename = 'test.txt'
+    base_filename = 'test2.txt'
     actual_path = os.path.join(dir_name, base_filename)
     configuration = read_file(actual_path)
     plot(configuration)

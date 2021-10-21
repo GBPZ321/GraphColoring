@@ -1,5 +1,9 @@
+import formatter.GraphOutputFormatter;
 import graph.ColorableVertex;
+import graph.GraphDefinition;
 import org.jgrapht.Graph;
+import org.jgrapht.alg.color.SaturationDegreeColoring;
+import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;
 import reader.DimacsReader;
 import reader.GraphReader;
@@ -10,7 +14,11 @@ public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        Graph<ColorableVertex, DefaultEdge> testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream("dsjc250.5.col"));
+        String name = "dsjc250.5.col";
+        GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
+        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraph());
+        VertexColoringAlgorithm.Coloring<Integer> coloring = graphColoring.getColoring();
+        GraphOutputFormatter.writeGraphToFile(coloring, testGraph);
     }
 
 }
