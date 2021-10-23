@@ -1,6 +1,7 @@
 package reader;
 
-import graph.GraphDefinition;
+import graph.definition.GraphDefinition;
+import graph.definition.GraphMetadata;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
@@ -13,12 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DimacsReader implements GraphReader {
+
+    /**
+     * Reads a graph in DIMACS format
+     * @param stream - input stream for Graph
+     * @param name - name of the graph
+     * @return A graph definition.
+     * @throws IOException Stream error
+     */
     @Override
     public GraphDefinition getGraph(InputStream stream, String name) throws IOException {
         Graph<Integer, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
         List<String> e = new ArrayList<>();
         int edges = 0;
-        int vertices = 0;
+        int vertices;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -45,6 +54,12 @@ public class DimacsReader implements GraphReader {
             }
         }
         assert edges == 0;
-        return new GraphDefinition(g, e, name);
+        return GraphDefinition.builder()
+                .graph(g)
+                .metadata(GraphMetadata.builder()
+                        .edges(e)
+                        .graphName(name)
+                        .build())
+                .build();
     }
 }

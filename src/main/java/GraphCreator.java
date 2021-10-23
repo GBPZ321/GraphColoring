@@ -1,7 +1,5 @@
 import formatter.GraphOutputFormatter;
-import graph.ColorableVertex;
-import graph.GraphDefinition;
-import org.jgrapht.Graph;
+import graph.definition.GraphDefinition;
 import org.jgrapht.alg.color.SaturationDegreeColoring;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;

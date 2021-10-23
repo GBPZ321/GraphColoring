@@ -1,9 +1,6 @@
 package reader;
 
-import graph.ColorableVertex;
-import graph.GraphDefinition;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
+import graph.definition.GraphDefinition;
 
 import java.io.IOException;
 import java.io.InputStream;

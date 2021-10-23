@@ -1,6 +1,6 @@
 package formatter;
 
-import graph.GraphDefinition;
+import graph.definition.GraphDefinition;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
 import java.io.*;
@@ -13,11 +13,11 @@ public class GraphOutputFormatter {
                 .vertexCount(graphDefinition.getGraph().vertexSet().size())
                 .edgeCount(graphDefinition.getGraph().edgeSet().size())
                 .colors(coloring.getColors())
-                .edges(graphDefinition.getEdges())
+                .edges(graphDefinition.getMetadata().getEdges())
                 .build();
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(graphDefinition.getGraphName() + ".soln"), StandardCharsets.UTF_8))) {
+                new FileOutputStream(graphDefinition.getMetadata().getGraphName() + ".soln"), StandardCharsets.UTF_8))) {
             writer.write(schema.toString());
         }
     }
