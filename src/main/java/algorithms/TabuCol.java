@@ -9,6 +9,7 @@ import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;
 import utility.Satisfies;
 
+import java.util.List;
 import java.util.Map;
 
 import static utility.GraphHelperFunctions.satisfies;
@@ -18,20 +19,17 @@ public class TabuCol implements VertexColoringAlgorithm<Integer> {
     private final GraphDefinition graphDefinition;
     private SolutionMatrix solutionMatrix;
     private Coloring<Integer> finalSolution;
-    private static final Integer ITERATIONS = 100; // 10s
+    private static final Integer ITERATIONS = 100;
 
     public TabuCol(GraphDefinition graphDefinition) {
         this.graphDefinition = graphDefinition;
-        int n = graphDefinition.getGraphWrapper().getVertexSize();
     }
 
     @Override
     public Coloring<Integer> getColoring() {
-        RandomInitialColoring rndColor = new RandomInitialColoring(graphDefinition.getGraphWrapper().getGraph());
-        Coloring<Integer> coloring = rndColor.getColoring();
         int k = graphDefinition.getGraphWrapper().getVertexSize();
         while(k > 1) {
-            TabucolSolution tabucol = tabucol(coloring);
+            TabucolSolution tabucol = tabucol(k, ITERATIONS, 1, 1);
             if(tabucol.getStatus() == ColoringStatus.SATISFIED) {
                 this.finalSolution = tabucol.getSolution();
             }
@@ -43,8 +41,12 @@ public class TabuCol implements VertexColoringAlgorithm<Integer> {
         return finalSolution;
     }
 
-    private TabucolSolution tabucol(Coloring<Integer> coloring) {
-        int iterations = ITERATIONS;
+    private TabucolSolution tabucol(int k, int iterations, int L, int alpha) {
+        System.out.println("Timeout : " + iterations);
+        System.out.println("L: " + L);
+        System.out.println("Alpha: " + alpha);
+        RandomInitialColoring rndColor = new RandomInitialColoring(graphDefinition.getGraphWrapper().getGraph(), k);
+        Coloring<Integer> coloring = rndColor.getColoring();
         solutionMatrix = new SolutionMatrix(coloring, graphDefinition);
         TabucolSolution tabucolSolution = new TabucolSolution();
         while(true) {
@@ -66,8 +68,10 @@ public class TabuCol implements VertexColoringAlgorithm<Integer> {
         Triple<Integer, Integer, Integer> vertexColoringMove = new Triple<>();
         Graph<Integer, DefaultEdge> graph = graphDefinition.getGraphWrapper().getGraph();
         Map<Integer, Integer> colorMap = coloring.getColors();
+        Map<Integer, List<Integer>> adjList = graphDefinition.getGraphWrapper().getAdjList();
         for(Integer vertex : graph.vertexSet()) {
             Integer vertexColor = colorMap.get(vertex);
+            //TODO: NEED TO SEE IF MOVE IN TABU MATRIX
             for(int colors = 1; colors <= coloring.getNumberColors(); ++colors) {
                 if(colors == vertexColor) continue;
                 int delta = solutionMatrix.getMatrixEntry(vertex, colors) - solutionMatrix.getMatrixEntry(vertex, vertexColor);
@@ -84,8 +88,16 @@ public class TabuCol implements VertexColoringAlgorithm<Integer> {
                 }
             }
         }
+        Integer v = vertexColoringMove.getVertex();
+        Integer i = colorMap.get(v);
+        Integer j = vertexColoringMove.getColor();
+        for(Integer u : adjList.get(v)) {
+            int c_ui = solutionMatrix.getMatrixEntry(u, i);
+            int c_uj = solutionMatrix.getMatrixEntry(u, j);
+            solutionMatrix.updateMatrix(u, i, c_ui - 1);
+            solutionMatrix.updateMatrix(u, j, c_uj + 1);
+        }
 
-        //Perform move
         //Update tabu matrix.
 
     }
