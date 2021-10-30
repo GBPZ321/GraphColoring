@@ -1,5 +1,6 @@
 from graph_metadata import read_file
 import os
+import sys
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -23,8 +24,12 @@ def plot(configuration):
 
 
 if __name__ == "__main__":
-    dir_name = os.getcwd()
-    base_filename = 'test2.txt'
-    actual_path = os.path.join(dir_name, base_filename)
-    configuration = read_file(actual_path)
-    plot(configuration)
+    if len(sys.argv) != 2:
+        print('Please provide a filename that contains data that conforms to the plotting schema:')
+        print('$ python3 create_plot.py filename')
+    else:
+        dir_name = os.getcwd()
+        base_filename = sys.argv[-1]
+        actual_path = os.path.join(dir_name, base_filename)
+        configuration = read_file(actual_path)
+        plot(configuration)

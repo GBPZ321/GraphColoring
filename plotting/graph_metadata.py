@@ -1,5 +1,5 @@
 import os
-
+import sys
 
 def read_file(file_name):
     configuration = {}
@@ -27,7 +27,13 @@ def read_file(file_name):
     return configuration
 
 if __name__ == "__main__":
-    dir_name = os.getcwd()
-    base_filename = 'test.txt'
-    actual_path = os.path.join(dir_name, base_filename)
-    print(read_file(actual_path))
+
+    if len(sys.argv) != 2:
+        print('Please provide a filename that contains data that conforms to the plotting schema:')
+        print('$ python3 graph_metadata.py filename')
+    else:
+        filename = sys.argv[-1]
+        dir_name = os.getcwd()
+        base_filename = filename
+        actual_path = os.path.join(dir_name, base_filename)
+        print(read_file(actual_path))
