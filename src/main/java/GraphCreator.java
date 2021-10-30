@@ -14,7 +14,7 @@ public class GraphCreator {
         GraphReader reader = new DimacsReader();
         String name = "dsjc250.5.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
-        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraph());
+        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraphWrapper().getGraph());
         VertexColoringAlgorithm.Coloring<Integer> coloring = graphColoring.getColoring();
         GraphOutputFormatter.writeGraphToFile(coloring, testGraph);
     }

@@ -10,8 +10,8 @@ public class GraphOutputFormatter {
     public static void writeGraphToFile(VertexColoringAlgorithm.Coloring<Integer> coloring, GraphDefinition graphDefinition) throws IOException {
 
         Schema schema = Schema.builder()
-                .vertexCount(graphDefinition.getGraph().vertexSet().size())
-                .edgeCount(graphDefinition.getGraph().edgeSet().size())
+                .vertexCount(graphDefinition.getGraphWrapper().getVertexSize())
+                .edgeCount(graphDefinition.getGraphWrapper().getGraph().edgeSet().size())
                 .colors(coloring.getColors())
                 .edges(graphDefinition.getMetadata().getEdges())
                 .build();

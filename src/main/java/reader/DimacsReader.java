@@ -2,6 +2,7 @@ package reader;
 
 import graph.definition.GraphDefinition;
 import graph.definition.GraphMetadata;
+import graph.definition.GraphWrapper;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
@@ -11,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DimacsReader implements GraphReader {
 
@@ -26,6 +29,7 @@ public class DimacsReader implements GraphReader {
     public GraphDefinition getGraph(InputStream stream, String name) throws IOException {
         Graph<Integer, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
         List<String> e = new ArrayList<>();
+        Map<Integer, List<Integer>> adjacencyListMap = new HashMap<>();
         int edges = 0;
         int vertices;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
@@ -38,9 +42,9 @@ public class DimacsReader implements GraphReader {
                     vertices = Integer.parseInt(problemStatement[2]);
                     for(int i = 1; i <= vertices; ++i) {
                         g.addVertex(i);
+                        adjacencyListMap.put(i, new ArrayList<>());
                     }
                     edges = Integer.parseInt(problemStatement[3]);
-
                 }
                 if(line.startsWith("e")) {
                     e.add(line.replace("e ", "").trim());
@@ -48,6 +52,7 @@ public class DimacsReader implements GraphReader {
                     assert components.length == 3;
                     Integer v1 = Integer.parseInt(components[1]);
                     Integer v2 = Integer.parseInt(components[2]);
+                    adjacencyListMap.get(v1).add(v2);
                     g.addEdge(v1, v2);
                     edges--;
                 }
@@ -55,7 +60,7 @@ public class DimacsReader implements GraphReader {
         }
         assert edges == 0;
         return GraphDefinition.builder()
-                .graph(g)
+                .graphWrapper(new GraphWrapper(g, adjacencyListMap))
                 .metadata(GraphMetadata.builder()
                         .edges(e)
                         .graphName(name)

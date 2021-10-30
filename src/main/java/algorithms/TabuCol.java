@@ -1,38 +1,96 @@
 package algorithms;
 
+import datastructures.SolutionMatrix;
+import datastructures.Triple;
+import enums.ColoringStatus;
 import graph.definition.GraphDefinition;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
-import utility.GraphHelperFunctions;
+import org.jgrapht.graph.DefaultEdge;
 import utility.Satisfies;
+
+import java.util.Map;
+
+import static utility.GraphHelperFunctions.satisfies;
 
 public class TabuCol implements VertexColoringAlgorithm<Integer> {
 
-    private final Integer startingK;
     private final GraphDefinition graphDefinition;
-    private static final Integer TIMEOUT = 10000; // 10s
+    private SolutionMatrix solutionMatrix;
+    private Coloring<Integer> finalSolution;
+    private static final Integer ITERATIONS = 100; // 10s
 
-    public TabuCol(Integer startingK, GraphDefinition graphDefinition) {
-        this.startingK = startingK;
+    public TabuCol(GraphDefinition graphDefinition) {
         this.graphDefinition = graphDefinition;
+        int n = graphDefinition.getGraphWrapper().getVertexSize();
     }
 
     @Override
     public Coloring<Integer> getColoring() {
-        RandomInitialColoring coloring = new RandomInitialColoring(graphDefinition.getGraph(), startingK);
-        Coloring<Integer> coloringArray = coloring.getColoring();
-        int i = 0;
-        long startTime = System.currentTimeMillis();
-        while(viable(startTime, coloringArray)) {
-            // Check adjacent colorings
-            // If coloring is better, swap.
-            // Keep going etc.
+        RandomInitialColoring rndColor = new RandomInitialColoring(graphDefinition.getGraphWrapper().getGraph());
+        Coloring<Integer> coloring = rndColor.getColoring();
+        int k = graphDefinition.getGraphWrapper().getVertexSize();
+        while(k > 1) {
+            TabucolSolution tabucol = tabucol(coloring);
+            if(tabucol.getStatus() == ColoringStatus.SATISFIED) {
+                this.finalSolution = tabucol.getSolution();
+            }
+            if(tabucol.getStatus() == ColoringStatus.TIMEOUT) {
+                return finalSolution;
+            }
+            k--;
         }
-        return null;
+        return finalSolution;
     }
 
-    private boolean viable(long startTime, Coloring<Integer> coloringArray) {
-        if(System.currentTimeMillis() - startTime > TIMEOUT) return false;
-        Satisfies sat = GraphHelperFunctions.satisfies(graphDefinition, coloringArray);
-        return sat.getErrorCount() > 0;
+    private TabucolSolution tabucol(Coloring<Integer> coloring) {
+        int iterations = ITERATIONS;
+        solutionMatrix = new SolutionMatrix(coloring, graphDefinition);
+        TabucolSolution tabucolSolution = new TabucolSolution();
+        while(true) {
+            iterations--;
+            if(iterations == 0) {
+                tabucolSolution.setStatus(ColoringStatus.TIMEOUT);
+                return tabucolSolution;
+            }
+            Satisfies satisfies = viable(coloring);
+            if(satisfies.getErrorCount() == 0) {
+                tabucolSolution.setStatus(ColoringStatus.SATISFIED);
+                tabucolSolution.setSolution(coloring);
+            }
+            findBestMoveAndUpdateMatrices(coloring);
+        }
+    }
+
+    private void findBestMoveAndUpdateMatrices(Coloring<Integer> coloring) {
+        Triple<Integer, Integer, Integer> vertexColoringMove = new Triple<>();
+        Graph<Integer, DefaultEdge> graph = graphDefinition.getGraphWrapper().getGraph();
+        Map<Integer, Integer> colorMap = coloring.getColors();
+        for(Integer vertex : graph.vertexSet()) {
+            Integer vertexColor = colorMap.get(vertex);
+            for(int colors = 1; colors <= coloring.getNumberColors(); ++colors) {
+                if(colors == vertexColor) continue;
+                int delta = solutionMatrix.getMatrixEntry(vertex, colors) - solutionMatrix.getMatrixEntry(vertex, vertexColor);
+                if(vertexColoringMove.isEmpty()) {
+                    vertexColoringMove.setEmpty(false);
+                    vertexColoringMove.setVertex(vertex);
+                    vertexColoringMove.setColor(colors);
+                    vertexColoringMove.setDelta(delta);
+                }
+                if(delta < vertexColoringMove.getDelta()) {
+                    vertexColoringMove.setVertex(vertex);
+                    vertexColoringMove.setColor(colors);
+                    vertexColoringMove.setDelta(delta);
+                }
+            }
+        }
+
+        //Perform move
+        //Update tabu matrix.
+
+    }
+
+    private Satisfies viable(Coloring<Integer> coloringArray) {
+        return satisfies(graphDefinition, coloringArray);
     }
 }

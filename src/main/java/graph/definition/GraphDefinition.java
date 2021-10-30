@@ -15,7 +15,7 @@ public class GraphDefinition {
     /**
      * The graph itself.
      */
-    private Graph<Integer, DefaultEdge> graph;
+    private GraphWrapper graphWrapper;
     /**
      * Useful information for printing or knowledge about graph.
      */
