@@ -1,5 +1,6 @@
 package algorithms;
 
+import datastructures.Move;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
 import datastructures.Triple;
@@ -11,6 +12,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TabucolSubroutine {
     private final GraphDefinition graphDefinition;
@@ -48,37 +50,32 @@ public class TabucolSubroutine {
     }
 
     private void findBestMoveAndUpdateMatrices(VertexColoringAlgorithm.Coloring<Integer> coloring, int conflictNumber) {
-        Triple<Integer, Integer, Integer> vertexColoringMove = new Triple<>();
-        Graph<Integer, DefaultEdge> graph = graphDefinition.getGraphWrapper().getGraph();
+        int max = -graphDefinition.getGraphWrapper().getVertexSize();
+        Set<Integer> vertexSet = graphDefinition.getGraphWrapper().getGraph().vertexSet();
+        Move move = new Move();
         Map<Integer, Integer> colorMap = coloring.getColors();
-        Map<Integer, List<Integer>> adjList = graphDefinition.getGraphWrapper().getAdjList();
-        for(Integer vertex : graph.vertexSet()) {
-            Integer vertexColor = colorMap.get(vertex);
-
-            for(int potentialColorChange = 1; potentialColorChange <= coloring.getNumberColors(); ++potentialColorChange) {
-                if(potentialColorChange == vertexColor) continue;
-                int delta = solutionMatrix.getMatrixEntry(vertex, potentialColorChange) - solutionMatrix.getMatrixEntry(vertex, vertexColor);
-                if(tabuStructure.isInTabuMatrix(vertex, potentialColorChange)) continue;
-                if(vertexColoringMove.isEmpty()) {
-                    vertexColoringMove.setEmpty(false);
-                    vertexColoringMove.setVertex(vertex);
-                    vertexColoringMove.setColor(potentialColorChange);
-                    vertexColoringMove.setDelta(delta);
-                }
-                if(delta < vertexColoringMove.getDelta()) {
-                    vertexColoringMove.setVertex(vertex);
-                    vertexColoringMove.setColor(potentialColorChange);
-                    vertexColoringMove.setDelta(delta);
+        for(int newColor = 1; newColor <= k; ++newColor) {
+            for(Integer vertex : vertexSet) {
+                Integer oldColor = colorMap.get(vertex);
+                if(newColor == oldColor) continue;
+                if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
+                int delta = solutionMatrix.getMatrixEntry(vertex, oldColor) - solutionMatrix.getMatrixEntry(vertex, newColor);
+                if(delta > max) {
+                    move.setColor(newColor);
+                    move.setVertex(vertex);
                 }
             }
         }
-        Integer v = vertexColoringMove.getVertex();
-        Integer i = colorMap.get(v);
-        Integer j = vertexColoringMove.getColor();
+
+        Map<Integer, List<Integer>> adjList = graphDefinition.getGraphWrapper().getAdjList();
+
+        Integer v = move.getVertex();
+        Integer oldColor = colorMap.get(v);
+        Integer j = move.getColor();
         for(Integer u : adjList.get(v)) {
-            int c_ui = solutionMatrix.getMatrixEntry(u, i);
+            int c_ui = solutionMatrix.getMatrixEntry(u, oldColor);
             int c_uj = solutionMatrix.getMatrixEntry(u, j);
-            solutionMatrix.updateMatrix(u, i, c_ui - 1);
+            solutionMatrix.updateMatrix(u, oldColor, c_ui - 1);
             solutionMatrix.updateMatrix(u, j, c_uj + 1);
         }
         tabuStructure.insertTabuColor(conflictNumber, v, j);
