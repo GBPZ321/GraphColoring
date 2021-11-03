@@ -16,7 +16,7 @@ public class GraphCreator {
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
         SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraphWrapper().getGraph());
         VertexColoringAlgorithm.Coloring<Integer> coloring = graphColoring.getColoring();
-        GraphOutputFormatter.writeGraphToFile(coloring, testGraph);
+        System.out.println(coloring.getNumberColors());
     }
 
 }

@@ -1,13 +1,10 @@
 package datastructures;
 
-import com.google.common.collect.EvictingQueue;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.*;
 
 public class TabuStructure {
     private final Deque<TabuColor> forbiddenQueue;
-    private final Map<Integer, Map<Integer, Boolean>> tabuColorMap;
+    private final Map<Integer, Set<Integer>> tabuColorMap;
     private final int L;
     private final int alpha;
 
@@ -24,22 +21,22 @@ public class TabuStructure {
         newColor.setVertex(vertex);
         forbiddenQueue.add(newColor);
         if(!tabuColorMap.containsKey(vertex)) {
-            tabuColorMap.put(vertex, new HashMap<>());
+            tabuColorMap.put(vertex, new HashSet<>());
         }
-        tabuColorMap.get(vertex).put(color, true);
+        tabuColorMap.get(vertex).add(color);
 
         int maxSize = L + conflictNumber * alpha;
-        while (forbiddenQueue.size() > maxSize) {
+        int queueSize = forbiddenQueue.size();
+        while (queueSize > maxSize) {
             TabuColor remove = forbiddenQueue.removeLast();
             tabuColorMap.get(remove.getVertex()).remove(remove.getColor());
+            queueSize--;
         }
     }
 
     public boolean isInTabuMatrix(int vertex, int color) {
-        Map<Integer, Boolean> colorConfirmation = tabuColorMap.get(vertex);
+        Set<Integer> colorConfirmation = tabuColorMap.get(vertex);
         if(Objects.isNull(colorConfirmation)) return false;
-        Boolean isPresent = colorConfirmation.get(color);
-        if(Objects.isNull(isPresent)) return false;
-        return isPresent;
+        return colorConfirmation.contains(color);
     }
 }

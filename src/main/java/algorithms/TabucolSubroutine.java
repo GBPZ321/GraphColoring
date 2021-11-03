@@ -47,6 +47,8 @@ public class TabucolSubroutine {
             }
             findBestMoveAndUpdateMatrices(coloring, conflictNumber);
         }
+
+        return
     }
 
     private void findBestMoveAndUpdateMatrices(VertexColoringAlgorithm.Coloring<Integer> coloring, int conflictNumber) {
@@ -79,5 +81,6 @@ public class TabucolSubroutine {
             solutionMatrix.updateMatrix(u, j, c_uj + 1);
         }
         tabuStructure.insertTabuColor(conflictNumber, v, j);
+        coloring.getColors().put(v, j);
     }
 }
