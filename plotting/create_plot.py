@@ -8,18 +8,21 @@ import matplotlib.pyplot as plt
 def plot(configuration):
     G = nx.Graph()
     color_map = configuration['color_list']
-    print(color_map)
+
     for index, item in enumerate(color_map):
         G.add_node(index + 1)
-    print(G)
-    print(G.nodes)
+
+    print('--- edges ---')
     for e in configuration['edges']:
-        print(e[0], e[1])
+        print(f'{e[0]}-{e[1]}')
         G.add_edge(e[0], e[1])
 
+    print('--- metadata ---')
     print(G)
-    print(G.nodes)
-    nx.draw(G, node_color=color_map, with_labels=True)
+    print(f'color map: {color_map}')
+
+    plt.figure(1, figsize=(40, 40))
+    nx.draw_random(G, node_size=600, node_color=color_map, with_labels=True)
     plt.show()
 
 
