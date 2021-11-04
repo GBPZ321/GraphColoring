@@ -49,6 +49,7 @@ public class TabucolSubroutine {
 
     private void findBestMoveAndUpdateMatrices(VertexColoringAlgorithm.Coloring<Integer> coloring, int conflictNumber) {
         int max = -graphDefinition.getGraphWrapper().getVertexSize();
+        //TODO: Review this logic.
         Set<Integer> vertexSet = graphDefinition.getGraphWrapper().getGraph().vertexSet();
         Move move = new Move();
         Map<Integer, Integer> colorMap = coloring.getColors();
@@ -61,6 +62,7 @@ public class TabucolSubroutine {
                 if(delta > max) {
                     move.setColor(newColor);
                     move.setVertex(vertex);
+                    max = delta;
                 }
             }
         }
@@ -68,7 +70,7 @@ public class TabucolSubroutine {
         Integer v = move.getVertex();
         Integer oldColor = colorMap.get(v);
         Integer replacementColor = move.getColor();
-        solutionMatrix.updateMatrix(v, oldColor, replacementColor);
+        solutionMatrix.updateSolution(v, oldColor, replacementColor);
         tabuStructure.insertTabuColor(conflictNumber, v, replacementColor);
         coloring.getColors().put(v, replacementColor);
     }

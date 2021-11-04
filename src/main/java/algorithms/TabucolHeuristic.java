@@ -18,7 +18,7 @@ public class TabucolHeuristic implements VertexColoringAlgorithm<Integer> {
     public Coloring<Integer> getColoring() {
         int k = graphDefinition.getGraphWrapper().getVertexSize();
         while(k > 1) {
-            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, 5, 2, ITERATIONS);
+            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, 1, 6, ITERATIONS);
             TabucolSolution possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 this.finalSolution = possibleSolution.getSolution();
