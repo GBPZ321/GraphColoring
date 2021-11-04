@@ -30,13 +30,12 @@ public class DimacsReader implements GraphReader {
         Graph<Integer, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
         List<String> e = new ArrayList<>();
         Map<Integer, List<Integer>> adjacencyListMap = new HashMap<>();
-        int edges = 0;
         int vertices;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if(line.startsWith("c")) continue;
-                if(line.startsWith("p")) {
+                else if(line.startsWith("p")) {
                     String[] problemStatement = line.split(" ");
                     assert problemStatement.length == 4;
                     vertices = Integer.parseInt(problemStatement[2]);
@@ -44,9 +43,8 @@ public class DimacsReader implements GraphReader {
                         g.addVertex(i);
                         adjacencyListMap.put(i, new ArrayList<>());
                     }
-                    edges = Integer.parseInt(problemStatement[3]);
                 }
-                if(line.startsWith("e")) {
+                else if(line.startsWith("e")) {
                     e.add(line.replace("e ", "").trim());
                     String[] components = line.split(" ");
                     assert components.length == 3;
@@ -54,11 +52,11 @@ public class DimacsReader implements GraphReader {
                     Integer v2 = Integer.parseInt(components[2]);
                     adjacencyListMap.get(v1).add(v2);
                     g.addEdge(v1, v2);
-                    edges--;
                 }
             }
         }
-        assert edges == 0;
+
+
         return GraphDefinition.builder()
                 .graphWrapper(new GraphWrapper(g, adjacencyListMap))
                 .metadata(GraphMetadata.builder()

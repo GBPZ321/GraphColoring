@@ -13,7 +13,6 @@ public class SolutionMatrix {
     private final int n;
     private final int k;
     private final int[][] matrix;
-    private int conflictNumber;
 
     public SolutionMatrix(VertexColoringAlgorithm.Coloring<Integer> coloring, GraphDefinition definition) {
         this.coloring = coloring;
@@ -21,7 +20,6 @@ public class SolutionMatrix {
         this.n = definition.getGraphWrapper().getVertexSize();
         this.k = coloring.getNumberColors();
         this.matrix = new int[n][k];
-        this.conflictNumber = 0;
         defaultMatrix();
         initializeMatrix();
     }
@@ -37,31 +35,27 @@ public class SolutionMatrix {
         Map<Integer, Integer> colors = coloring.getColors();
         for(int v = 0; v < n; ++v) {
             for(int i = 0; i < k; ++i) {
+                if(!adjList.containsKey(v)) continue;
                 for(int adjVertex : adjList.get(v)) {
                     if(colors.get(adjVertex) == i) {
                         matrix[v][i]++;
-                        conflictNumber++;
                     }
                 }
             }
         }
-        conflictNumber /= 2; // double counted
     }
 
     public void updateMatrix(int vertex, int column, int value) {
         matrix[vertex - 1][column] = value;
-        conflictNumber += value;
     }
 
     public int getMatrixEntry(int vertex, int column) {
         return matrix[vertex - 1][column];
     }
 
-    public int[] row(int vertex) {
-        return matrix[vertex - 1];
-    }
-
     public int getConflictNumber() {
+
+        //TODO: Error is here.
         int conflictNumber = 0;
         for(int i = 0; i < n; ++i) {
             for(int k = 0; k < n; ++k) {

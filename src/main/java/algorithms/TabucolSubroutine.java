@@ -1,14 +1,11 @@
 package algorithms;
 
-import datastructures.Move;
+import datastructures.pojo.Move;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
-import datastructures.Triple;
-import enums.ColoringStatus;
+import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
-import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
-import org.jgrapht.graph.DefaultEdge;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +27,7 @@ public class TabucolSubroutine {
 
     TabucolSolution findSolution() {
         int runs = iterations;
-        RandomInitialColoring rndColor = new RandomInitialColoring(graphDefinition.getGraphWrapper().getGraph(), k);
+        SimpleOrderedColoring rndColor = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), k);
         VertexColoringAlgorithm.Coloring<Integer> coloring = rndColor.getColoring();
         solutionMatrix = new SolutionMatrix(coloring, graphDefinition);
         TabucolSolution tabucolSolution = new TabucolSolution();
@@ -44,11 +41,10 @@ public class TabucolSubroutine {
             if(conflictNumber == 0) {
                 tabucolSolution.setStatus(ColoringStatus.SATISFIED);
                 tabucolSolution.setSolution(coloring);
+                return tabucolSolution;
             }
             findBestMoveAndUpdateMatrices(coloring, conflictNumber);
         }
-
-        return
     }
 
     private void findBestMoveAndUpdateMatrices(VertexColoringAlgorithm.Coloring<Integer> coloring, int conflictNumber) {
@@ -56,7 +52,7 @@ public class TabucolSubroutine {
         Set<Integer> vertexSet = graphDefinition.getGraphWrapper().getGraph().vertexSet();
         Move move = new Move();
         Map<Integer, Integer> colorMap = coloring.getColors();
-        for(int newColor = 1; newColor <= k; ++newColor) {
+        for(int newColor = 0; newColor < k; ++newColor) {
             for(Integer vertex : vertexSet) {
                 Integer oldColor = colorMap.get(vertex);
                 if(newColor == oldColor) continue;

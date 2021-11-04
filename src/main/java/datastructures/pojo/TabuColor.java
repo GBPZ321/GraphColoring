@@ -1,4 +1,4 @@
-package datastructures;
+package datastructures.pojo;
 
 import lombok.Data;
 

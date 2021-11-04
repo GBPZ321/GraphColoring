@@ -1,5 +1,7 @@
 package datastructures;
 
+import datastructures.pojo.TabuColor;
+
 import java.util.*;
 
 public class TabuStructure {

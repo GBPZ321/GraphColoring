@@ -1,6 +1,6 @@
 package algorithms;
 
-import enums.ColoringStatus;
+import datastructures.pojo.ColoringStatus;
 import lombok.Data;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
