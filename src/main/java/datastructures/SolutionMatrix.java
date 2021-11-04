@@ -35,13 +35,22 @@ public class SolutionMatrix {
         Map<Integer, Integer> colors = coloring.getColors();
         for(int v = 0; v < n; ++v) {
             for(int i = 0; i < k; ++i) {
-                if(!adjList.containsKey(v)) continue;
-                for(int adjVertex : adjList.get(v)) {
+                for(int adjVertex : adjList.get(v + 1)) {
                     if(colors.get(adjVertex) == i) {
                         matrix[v][i]++;
                     }
                 }
             }
+        }
+    }
+
+    public void updateSolution(int vertex, int oldColor, int newColor) {
+        Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
+        int actualVertexKey = vertex - 1;
+        if(!adjList.containsKey(actualVertexKey)) return;
+        for(int u : adjList.get(actualVertexKey)) {
+            matrix[u][oldColor] = matrix[u][oldColor] - 1;
+            matrix[u][newColor] = matrix[u][newColor] + 1;
         }
     }
 

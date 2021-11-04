@@ -65,18 +65,11 @@ public class TabucolSubroutine {
             }
         }
 
-        Map<Integer, List<Integer>> adjList = graphDefinition.getGraphWrapper().getAdjList();
-
         Integer v = move.getVertex();
         Integer oldColor = colorMap.get(v);
-        Integer j = move.getColor();
-        for(Integer u : adjList.get(v)) {
-            int c_ui = solutionMatrix.getMatrixEntry(u, oldColor);
-            int c_uj = solutionMatrix.getMatrixEntry(u, j);
-            solutionMatrix.updateMatrix(u, oldColor, c_ui - 1);
-            solutionMatrix.updateMatrix(u, j, c_uj + 1);
-        }
-        tabuStructure.insertTabuColor(conflictNumber, v, j);
-        coloring.getColors().put(v, j);
+        Integer replacementColor = move.getColor();
+        solutionMatrix.updateMatrix(v, oldColor, replacementColor);
+        tabuStructure.insertTabuColor(conflictNumber, v, replacementColor);
+        coloring.getColors().put(v, replacementColor);
     }
 }
