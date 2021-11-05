@@ -1,5 +1,6 @@
 package datastructures;
 
+import datastructures.pojo.Move;
 import graph.definition.GraphDefinition;
 import graph.definition.GraphWrapper;
 import org.jgrapht.Graph;
@@ -54,9 +55,8 @@ public class SolutionMatrix {
         Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
         Map<Integer, Integer> colors = coloring.getColors();
         for(int v = 0; v < n; ++v) {
-            List<Integer> adjacentVertices = adjList.get(v + 1);
-            for(Integer u : adjacentVertices) {
-                matrix[v][colors.get(u)]++;
+            for(int z = 0; z < k; ++z) {
+                matrix[v][z] = gamma(colors, v + 1, z, adjList);
             }
         }
     }
@@ -65,30 +65,54 @@ public class SolutionMatrix {
         Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
         int actualVertexKey = vertex - 1;
 
-        for(int u : adjList.get(vertex)) {
-            matrix[u - 1][oldColor] = matrix[u - 1][oldColor] - 1;
-            matrix[u - 1][newColor] = matrix[u - 1][newColor] + 1;
+        for(int w : adjList.get(vertex)) {
+            int wLabel = w - 1;
+            matrix[wLabel][newColor] = matrix[wLabel][newColor] + 1;
+
+            int problemChild = this.matrix[wLabel][oldColor];
+            if(problemChild == 0) {
+                System.out.println("Why would this be going below zero? ");
+            }
+            this.matrix[wLabel][oldColor] = problemChild - 1;
         }
-        int computedCount = this.currConflictCount + matrix[actualVertexKey][newColor] - matrix[actualVertexKey][oldColor];
+        int computedCount = this.getConflictNumber() + matrix[actualVertexKey][newColor] - matrix[actualVertexKey][oldColor];
         if(computedCount < 0) {
             System.out.println("Problem");
         }
-        this.currConflictCount = getConflictNumber();
+        this.currConflictCount = computedCount;
 
     }
+
 
     public int getMatrixEntry(int vertex, int column) {
         return matrix[vertex - 1][column];
     }
 
     public int getConflictNumber() {
+        return this.currConflictCount;
+    }
+
+    public static int delta(Map<Integer, Integer> coloring, int mVertex, int mColor, Map<Integer, List<Integer>> adjList) {
+        return gamma(coloring, mVertex, mColor, adjList) - gamma(coloring, mVertex, coloring.get(mVertex), adjList);
+    }
+
+    private static int gamma(Map<Integer, Integer> c, Integer vertex, Integer color, Map<Integer, List<Integer>> adjList) {
         int sum = 0;
-        for(int i = 0; i < n; ++i) {
-            sum += matrix[i][coloring.getColors().get(i + 1)];
+
+        for(int adjacent : adjList.get(vertex)) {
+            if(c.get(adjacent).equals(color)) {
+                sum++;
+            }
         }
         return sum;
     }
 
 
-
+    public int getMovePerformance(Integer vertex, Integer oldColor, int newColor, int currConflictCount) {
+        int perf = matrix[vertex - 1][newColor] - matrix[vertex - 1][oldColor];
+        if(perf > currConflictCount) { //Problem child scenario.
+            System.out.println("Problem");
+        }
+        return perf;
+    }
 }
