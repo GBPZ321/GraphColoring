@@ -54,12 +54,9 @@ public class SolutionMatrix {
         Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
         Map<Integer, Integer> colors = coloring.getColors();
         for(int v = 0; v < n; ++v) {
-            for(int i = 0; i < k; ++i) {
-                for(int adjVertex : adjList.get(v + 1)) {
-                    if(colors.get(adjVertex) == i) {
-                        matrix[v][i]++;
-                    }
-                }
+            List<Integer> adjacentVertices = adjList.get(v + 1);
+            for(Integer u : adjacentVertices) {
+                matrix[v][colors.get(u)]++;
             }
         }
     }
@@ -67,12 +64,17 @@ public class SolutionMatrix {
     public void updateSolution(int vertex, int oldColor, int newColor) {
         Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
         int actualVertexKey = vertex - 1;
-        //TODO: There is a problem here. Somewhere...
-        for(int u : adjList.get(actualVertexKey)) {
-            matrix[u][oldColor] = matrix[u][oldColor] - 1;
-            matrix[u][newColor] = matrix[u][newColor] + 1;
+
+        for(int u : adjList.get(vertex)) {
+            matrix[u - 1][oldColor] = matrix[u - 1][oldColor] - 1;
+            matrix[u - 1][newColor] = matrix[u - 1][newColor] + 1;
         }
-        this.currConflictCount = this.currConflictCount + matrix[actualVertexKey][newColor] - matrix[actualVertexKey][oldColor];
+        int computedCount = this.currConflictCount + matrix[actualVertexKey][newColor] - matrix[actualVertexKey][oldColor];
+        if(computedCount < 0) {
+            System.out.println("Problem");
+        }
+        this.currConflictCount = getConflictNumber();
+
     }
 
     public int getMatrixEntry(int vertex, int column) {
@@ -80,7 +82,11 @@ public class SolutionMatrix {
     }
 
     public int getConflictNumber() {
-        return currConflictCount;
+        int sum = 0;
+        for(int i = 0; i < n; ++i) {
+            sum += matrix[i][coloring.getColors().get(i + 1)];
+        }
+        return sum;
     }
 
 

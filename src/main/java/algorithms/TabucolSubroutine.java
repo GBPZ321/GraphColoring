@@ -59,12 +59,19 @@ public class TabucolSubroutine {
                 if(newColor == oldColor) continue;
                 if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
                 int delta = solutionMatrix.getMatrixEntry(vertex, oldColor) - solutionMatrix.getMatrixEntry(vertex, newColor);
+                if(delta < 0) {
+                    System.out.println("Interesting");
+                }
                 if(delta > max) {
                     move.setColor(newColor);
                     move.setVertex(vertex);
                     max = delta;
                 }
             }
+        }
+
+        if(max > conflictNumber) {
+            System.out.println("Problem");
         }
 
         Integer v = move.getVertex();
