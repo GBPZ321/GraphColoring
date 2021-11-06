@@ -29,7 +29,7 @@ public class TabucolSubroutine {
         int runs = iterations;
         SimpleOrderedColoring rndColor = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), k);
         VertexColoringAlgorithm.Coloring<Integer> coloring = rndColor.getColoring();
-        solutionMatrix = new SolutionMatrix(coloring, graphDefinition);
+        solutionMatrix = new SolutionMatrix(coloring.getColors(), coloring.getNumberColors(), graphDefinition);
         TabucolSolution tabucolSolution = new TabucolSolution();
         while(true) {
             runs--;
@@ -49,31 +49,8 @@ public class TabucolSubroutine {
 
     private void findBestMoveAndUpdateMatrices(VertexColoringAlgorithm.Coloring<Integer> coloring, int conflictNumber) {
         Set<Integer> vertexSet = graphDefinition.getGraphWrapper().getGraph().vertexSet();
-        int max = -vertexSet.size();
-        Move move = new Move();
         Map<Integer, Integer> colorMap = coloring.getColors();
-        for(int newColor = 0; newColor < k; ++newColor) {
-            for(Integer vertex : vertexSet) {
-                if(solutionMatrix.getMatrixEntry(vertex, colorMap.get(vertex)) == 0) continue;
-                Integer oldColor = colorMap.get(vertex);
-                if(newColor == oldColor) continue;
-                if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
-                int delta = solutionMatrix.getMovePerformance(vertex, oldColor, newColor, conflictNumber);
-                if(delta > conflictNumber) {
-                    System.out.println("Interesting");
-                }
-                if(delta > max) {
-                    move.setColor(newColor);
-                    move.setVertex(vertex);
-                    max = delta;
-                }
-            }
-        }
-
-        if(max > conflictNumber) {
-            System.out.println("Problem");
-        }
-
+        Move move = findBestMove(vertexSet, colorMap, conflictNumber);
         Integer v = move.getVertex();
         Integer oldColor = colorMap.get(v);
         Integer replacementColor = move.getColor();
@@ -82,5 +59,23 @@ public class TabucolSubroutine {
         tabuStructure.insertTabuColor(conflictNumber, v, replacementColor);
     }
 
-
+    private Move findBestMove(Set<Integer> vertexSet, Map<Integer, Integer> colorMap, int conflictNumber) {
+        int max = -vertexSet.size();
+        Move move = new Move();
+        for(int newColor = 0; newColor < k; ++newColor) {
+            for(Integer vertex : vertexSet) {
+                Integer oldColor = colorMap.get(vertex);
+                if(newColor == oldColor) continue;
+                if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
+                int delta = solutionMatrix.getMovePerformance(vertex, oldColor, newColor);
+                if(delta > max) {
+                    move.setColor(newColor);
+                    move.setVertex(vertex);
+                    max = delta;
+                }
+                if(delta == conflictNumber) return move;
+            }
+        }
+        return move;
+    }
 }

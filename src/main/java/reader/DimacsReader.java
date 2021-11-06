@@ -51,6 +51,7 @@ public class DimacsReader implements GraphReader {
                     Integer v1 = Integer.parseInt(components[1]);
                     Integer v2 = Integer.parseInt(components[2]);
                     adjacencyListMap.get(v1).add(v2);
+                    adjacencyListMap.get(v2).add(v1);
                     g.addEdge(v1, v2);
                 }
             }

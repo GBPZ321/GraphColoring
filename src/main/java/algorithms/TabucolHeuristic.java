@@ -8,7 +8,7 @@ public class TabucolHeuristic implements VertexColoringAlgorithm<Integer> {
 
     private final GraphDefinition graphDefinition;
     private Coloring<Integer> finalSolution;
-    private static final Integer ITERATIONS = 10000000;
+    private static final Integer ITERATIONS = 500;
 
     public TabucolHeuristic(GraphDefinition graphDefinition) {
         this.graphDefinition = graphDefinition;
