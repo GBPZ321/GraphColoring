@@ -24,6 +24,7 @@ At the moment, the graphs are too dense to be usable.
 
 ## Next steps in terms of priority 
 
-- Implementing TabuCol as per the KIT paper (see the queue and statistic sharing section).
+- DONE
 - Implementing CHECKCOL or HCD as our base local search algorithm.
+- Other implementations include PARTIALCOL, ANTCOL, Hill Climbing. 
 - Working on plotting infra.
