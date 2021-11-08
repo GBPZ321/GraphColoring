@@ -15,8 +15,9 @@ public class GraphCreator {
         String name = "dsjc250.5.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
         TabucolHeuristic heuristic = new TabucolHeuristic(testGraph);
-        VertexColoringAlgorithm.Coloring<Integer> coloring = heuristic.getColoring();
-//        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraphWrapper().getGraph());
+        VertexColoringAlgorithm.Coloring<Integer> coloring = heuristic.getColoring(); // 31 colors
+
+//        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraphWrapper().getGraph()); // 38 colors
 //        VertexColoringAlgorithm.Coloring<Integer> coloring = graphColoring.getColoring();
         System.out.println(coloring.getNumberColors());
     }
