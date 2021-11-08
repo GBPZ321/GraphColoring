@@ -20,4 +20,8 @@ public class GraphWrapper {
         this.vertexSize = graph.vertexSet().size();
         this.edgeCount =  graph.edgeSet().size();
     }
+
+    public List<Integer> getNeighborsOfV(int v) {
+        return adjList.get(v);
+    }
 }

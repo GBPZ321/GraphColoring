@@ -8,9 +8,9 @@ public class TabuStructure {
     private final Deque<TabuColor> forbiddenQueue;
     private final Map<Integer, Set<Integer>> tabuColorMap;
     private final int L;
-    private final int alpha;
+    private final float alpha;
 
-    public TabuStructure(int L, int alpha) {
+    public TabuStructure(int L, float alpha) {
         forbiddenQueue = new LinkedList<>();
         tabuColorMap = new HashMap<>();
         this.L = L;
@@ -27,10 +27,10 @@ public class TabuStructure {
         }
         tabuColorMap.get(vertex).add(color);
 
-        int maxSize = L + conflictNumber * alpha;
+        float maxSize = L + conflictNumber * alpha;
         int queueSize = forbiddenQueue.size();
         while (queueSize > maxSize) {
-            TabuColor remove = forbiddenQueue.removeLast();
+            TabuColor remove = forbiddenQueue.removeFirst();
             tabuColorMap.get(remove.getVertex()).remove(remove.getColor());
             queueSize--;
         }

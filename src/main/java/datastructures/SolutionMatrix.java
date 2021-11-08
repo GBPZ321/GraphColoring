@@ -22,19 +22,19 @@ public class SolutionMatrix {
     }
 
     private void initializeMatrix() {
-        Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
         for(int v = 0; v < n; ++v) {
             for(int z = 0; z < k; ++z) {
-                int gamma = gamma(coloring, v + 1, z, adjList);
+                int vertex = v + 1;
+                List<Integer> neighbors = definition.getGraphWrapper().getNeighborsOfV(vertex);
+                int gamma = gamma(coloring, z, neighbors);
                 matrix.setValue(v, z, gamma);
             }
         }
     }
 
     public void updateSolution(int vertex, int oldColor, int newColor) {
-        Map<Integer, List<Integer>> adjList = definition.getGraphWrapper().getAdjList();
-
-        for(int w : adjList.get(vertex)) {
+        List<Integer> neighborsOfV = definition.getGraphWrapper().getNeighborsOfV(vertex);
+        for(int w : neighborsOfV) {
             int wLabel = w - 1;
             matrix.getValue(wLabel, newColor);
             matrix.increment(wLabel, newColor);
@@ -51,10 +51,10 @@ public class SolutionMatrix {
         return conflictNumber;
     }
 
-    private static int gamma(Map<Integer, Integer> c, Integer vertex, Integer color, Map<Integer, List<Integer>> adjList) {
+    private static int gamma(Map<Integer, Integer> c, Integer color, List<Integer> neighbors) {
         int sum = 0;
 
-        for(int adjacent : adjList.get(vertex)) {
+        for(int adjacent : neighbors) {
             if(c.get(adjacent).equals(color)) {
                 sum++;
             }

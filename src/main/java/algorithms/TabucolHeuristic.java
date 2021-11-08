@@ -8,7 +8,7 @@ public class TabucolHeuristic implements VertexColoringAlgorithm<Integer> {
 
     private final GraphDefinition graphDefinition;
     private Coloring<Integer> finalSolution;
-    private static final Integer ITERATIONS = 500;
+    private static final Integer ITERATIONS = 100000;
 
     public TabucolHeuristic(GraphDefinition graphDefinition) {
         this.graphDefinition = graphDefinition;
@@ -18,7 +18,7 @@ public class TabucolHeuristic implements VertexColoringAlgorithm<Integer> {
     public Coloring<Integer> getColoring() {
         int k = graphDefinition.getGraphWrapper().getVertexSize();
         while(k > 1) {
-            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, 1, 6, ITERATIONS);
+            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, .6f, 8, ITERATIONS);
             TabucolSolution possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 this.finalSolution = possibleSolution.getSolution();

@@ -1,6 +1,8 @@
 import algorithms.TabucolHeuristic;
 import graph.definition.GraphDefinition;
+import org.jgrapht.alg.color.SaturationDegreeColoring;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
+import org.jgrapht.graph.DefaultEdge;
 import reader.DimacsReader;
 import reader.GraphReader;
 
@@ -14,6 +16,8 @@ public class GraphCreator {
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
         TabucolHeuristic heuristic = new TabucolHeuristic(testGraph);
         VertexColoringAlgorithm.Coloring<Integer> coloring = heuristic.getColoring();
+//        SaturationDegreeColoring<Integer, DefaultEdge> graphColoring = new SaturationDegreeColoring<>(testGraph.getGraphWrapper().getGraph());
+//        VertexColoringAlgorithm.Coloring<Integer> coloring = graphColoring.getColoring();
         System.out.println(coloring.getNumberColors());
     }
 

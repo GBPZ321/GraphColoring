@@ -7,9 +7,7 @@ import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TabucolSubroutine {
     private final GraphDefinition graphDefinition;
@@ -17,12 +15,14 @@ public class TabucolSubroutine {
     private final int iterations;
     private SolutionMatrix solutionMatrix;
     private final TabuStructure tabuStructure;
+    private final Random tieBreaker;
 
-    public TabucolSubroutine(GraphDefinition graphDefinition, int k, int alpha, int l, int iterationTimeout) {
+    public TabucolSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout) {
         this.graphDefinition = graphDefinition;
         this.k = k;
         this.iterations = iterationTimeout;
         this.tabuStructure = new TabuStructure(l, alpha);
+        this.tieBreaker = new Random();
     }
 
     TabucolSolution findSolution() {
@@ -61,21 +61,26 @@ public class TabucolSubroutine {
 
     private Move findBestMove(Set<Integer> vertexSet, Map<Integer, Integer> colorMap, int conflictNumber) {
         int max = -vertexSet.size();
-        Move move = new Move();
+        List<Move> potentialMoves = new ArrayList<>();
         for(int newColor = 0; newColor < k; ++newColor) {
             for(Integer vertex : vertexSet) {
                 Integer oldColor = colorMap.get(vertex);
                 if(newColor == oldColor) continue;
-                if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
                 int delta = solutionMatrix.getMovePerformance(vertex, oldColor, newColor);
-                if(delta > max) {
-                    move.setColor(newColor);
-                    move.setVertex(vertex);
-                    max = delta;
+                if(delta == conflictNumber) {
+                    return new Move(vertex, newColor);
                 }
-                if(delta == conflictNumber) return move;
+
+                if(tabuStructure.isInTabuMatrix(vertex, newColor)) continue;
+                if(delta > max) {
+                    potentialMoves.clear();
+                    potentialMoves.add(new Move(vertex, newColor));
+                    max = delta;
+                } else if(delta == max) {
+                    potentialMoves.add(new Move(vertex, newColor));
+                }
             }
         }
-        return move;
+        return potentialMoves.get(tieBreaker.nextInt(potentialMoves.size()));
     }
 }

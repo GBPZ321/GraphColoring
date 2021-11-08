@@ -4,10 +4,19 @@ Local search approximation algorithms exist for the Graph Coloring problem.
 
 Parallelizing the local searches and aggregating information can be beneficial. This was shown in this paper: https://baldur.iti.kit.edu/theses/CooperativeTabucol.pdf
 
+The experiment milestones: 
+- Implement Tabucol (IMPLEMENTED)
+- Implement CHECKCOL (see CHECKCOL.pdf)
+- Implement PARTIALCOL (see GuideToGraphColoring.pdf)
+- Time permitting explore the other algorithms mentioned in the PDF in this directory. (see GuideToGraphColoring.pdf)
 
-Given this, if change the base algorithm from Tabucol, do we get any benefits? 
+The experiment goals:
+- Let's implement these algorithms and run several simultaneously. Do we get better results when we run multiple and vary the parameters?
+- Let's run them together where they cooperate ("Hey everybody, I found a new lower bound for k you can stop your search and lower it")
+- 
 
-CHECKCOL is another example of a local search algorithm: https://www.sciencedirect.com/science/article/pii/S1570866705000262
+
+
 
 Otherwise the Java project is broken down like so:
 
