@@ -1,6 +1,7 @@
 package algorithms;
 
 
+import algorithms.random.SimpleOrderedColoring;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;

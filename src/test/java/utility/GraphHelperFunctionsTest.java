@@ -1,6 +1,6 @@
 package utility;
 
-import algorithms.SimpleOrderedColoring;
+import algorithms.random.SimpleOrderedColoring;
 import graph.definition.GraphDefinition;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

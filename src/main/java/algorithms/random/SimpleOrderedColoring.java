@@ -1,4 +1,4 @@
-package algorithms;
+package algorithms.random;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
@@ -11,6 +11,7 @@ import java.util.Map;
  * Returns a graph with nodes colored by their vertex.
  * The colors range from [0...(k-1)]
  * Colors must be ordered from [1...n]
+ * Does not usually produce a valid coloring unless k >= |V|
  */
 public class SimpleOrderedColoring implements VertexColoringAlgorithm<Integer> {
     private final Integer k;

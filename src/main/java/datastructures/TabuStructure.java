@@ -1,11 +1,11 @@
 package datastructures;
 
-import datastructures.pojo.TabuColor;
+import datastructures.pojo.Move;
 
 import java.util.*;
 
 public class TabuStructure {
-    private final Deque<TabuColor> forbiddenQueue;
+    private final Deque<Move> forbiddenQueue;
     private final Map<Integer, Set<Integer>> tabuColorMap;
     private final int L;
     private final float alpha;
@@ -18,7 +18,7 @@ public class TabuStructure {
     }
 
     public void insertTabuColor(int conflictNumber, int vertex, int color) {
-        TabuColor newColor = new TabuColor();
+        Move newColor = new Move();
         newColor.setColor(color);
         newColor.setVertex(vertex);
         forbiddenQueue.add(newColor);
@@ -30,7 +30,7 @@ public class TabuStructure {
         float maxSize = L + conflictNumber * alpha;
         int queueSize = forbiddenQueue.size();
         while (queueSize > maxSize) {
-            TabuColor remove = forbiddenQueue.removeFirst();
+            Move remove = forbiddenQueue.removeFirst();
             tabuColorMap.get(remove.getVertex()).remove(remove.getColor());
             queueSize--;
         }

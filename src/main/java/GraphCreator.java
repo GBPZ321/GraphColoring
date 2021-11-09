@@ -1,9 +1,6 @@
-import algorithms.HCDSubroutine;
-import algorithms.TabucolHeuristic;
+import algorithms.HCDHeuristic;
 import graph.definition.GraphDefinition;
-import org.jgrapht.alg.color.SaturationDegreeColoring;
-import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
-import org.jgrapht.graph.DefaultEdge;
+import graph.solution.GraphSolution;
 import reader.DimacsReader;
 import reader.GraphReader;
 
@@ -17,9 +14,9 @@ public class GraphCreator {
         GraphReader reader = new DimacsReader();
         String name = "dsjc250.5.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
-        HCDSubroutine subroutine = new HCDSubroutine(testGraph.getGraphWrapper());
-        subroutine.run();
-        boolean satisfied = sat(testGraph, subroutine.getFinalColoring());
+        HCDHeuristic solver = new HCDHeuristic(testGraph.getGraphWrapper());
+        GraphSolution solution = solver.getColoring();
+        boolean satisfied = sat(testGraph, solution.getColoring());
         System.out.println("Done? " + satisfied);
 
         //        TabucolHeuristic heuristic = new TabucolHeuristic(testGraph);

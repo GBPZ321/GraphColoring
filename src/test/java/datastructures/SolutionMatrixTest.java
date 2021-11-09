@@ -1,11 +1,6 @@
 package datastructures;
 
-import algorithms.SimpleOrderedColoring;
 import graph.definition.GraphDefinition;
-import org.jgrapht.Graph;
-import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultUndirectedGraph;
 import org.junit.jupiter.api.Test;
 import reader.DimacsReader;
 import utility.GraphHelperFunctions;

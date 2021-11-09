@@ -2,10 +2,11 @@ package algorithms;
 
 import datastructures.pojo.PriorityVertex;
 import graph.definition.GraphWrapper;
+import graph.solution.GraphSolution;
 
 import java.util.*;
 
-public class HCDSubroutine {
+public class HCDHeuristic implements ColoringHeuristic {
     private static final int STARTING_ITERATIONS = 1000;
     private int iterations;
     private int upperBound;
@@ -15,15 +16,7 @@ public class HCDSubroutine {
     private Map<Integer, Integer> finalColoring;
     private final GraphWrapper wrapper;
 
-    public Map<Integer, Integer> getFinalColoring() {
-        return finalColoring;
-    }
-
-    public int getUpperBound() {
-        return upperBound;
-    }
-
-    public HCDSubroutine(GraphWrapper graphWrapper) {
+    public HCDHeuristic(GraphWrapper graphWrapper) {
         iterations = STARTING_ITERATIONS;
         coloring = new HashMap<>();
         vPrimeQueue = new PriorityQueue<>();
@@ -45,8 +38,8 @@ public class HCDSubroutine {
         upperBound = wrapper.getVertexSize();
     }
 
-    public void run() {
-        while(gasStillInTank()) {
+    private void run() {
+        while(notFinished()) {
             iterations--;
             pullColors();
         }
@@ -128,7 +121,13 @@ public class HCDSubroutine {
         return true;
     }
 
-    private boolean gasStillInTank() {
+    private boolean notFinished() {
         return iterations > 0;
+    }
+
+    @Override
+    public GraphSolution getColoring() {
+        this.run();
+        return new GraphSolution(finalColoring, upperBound);
     }
 }

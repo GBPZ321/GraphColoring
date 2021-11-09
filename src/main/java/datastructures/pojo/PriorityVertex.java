@@ -3,8 +3,9 @@ package datastructures.pojo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Comparator;
-
+/**
+ * Vertex with the notion of priority.
+ */
 @Data
 @Builder
 public class PriorityVertex implements Comparable<PriorityVertex> {

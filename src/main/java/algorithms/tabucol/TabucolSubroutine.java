@@ -1,10 +1,12 @@
-package algorithms;
+package algorithms.tabucol;
 
+import algorithms.random.SimpleOrderedColoring;
 import datastructures.pojo.Move;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
 import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
+import graph.solution.GraphSolution;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
 import java.util.*;
@@ -25,7 +27,7 @@ public class TabucolSubroutine {
         this.tieBreaker = new Random();
     }
 
-    TabucolSolution findSolution() {
+    public TabucolSolution findSolution() {
         int runs = iterations;
         SimpleOrderedColoring rndColor = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), k);
         VertexColoringAlgorithm.Coloring<Integer> coloring = rndColor.getColoring();
@@ -40,7 +42,7 @@ public class TabucolSubroutine {
             int conflictNumber = solutionMatrix.getConflictNumber();
             if(conflictNumber == 0) {
                 tabucolSolution.setStatus(ColoringStatus.SATISFIED);
-                tabucolSolution.setSolution(coloring);
+                tabucolSolution.setSolution(new GraphSolution(coloring.getColors(), k));
                 return tabucolSolution;
             }
             findBestMoveAndUpdateMatrices(coloring, conflictNumber);
