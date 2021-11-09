@@ -7,12 +7,13 @@ import java.util.Comparator;
 
 @Data
 @Builder
-public class PriorityVertex implements Comparator<PriorityVertex> {
-    private int priority;
+public class PriorityVertex implements Comparable<PriorityVertex> {
+    private float priority;
     private int vertexNumber;
 
     @Override
-    public int compare(PriorityVertex o1, PriorityVertex o2) {
+    public int compareTo(PriorityVertex o2) {
+        PriorityVertex o1 = this;
         if(o1.priority == o2.priority) {
             return 0;
         }

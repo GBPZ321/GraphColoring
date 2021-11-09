@@ -6,6 +6,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 public class GraphWrapper {
@@ -23,5 +24,9 @@ public class GraphWrapper {
 
     public List<Integer> getNeighborsOfV(int v) {
         return adjList.get(v);
+    }
+
+    public Set<Integer> getVertices() {
+        return graph.vertexSet();
     }
 }

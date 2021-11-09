@@ -29,12 +29,12 @@ class GraphHelperFunctionsTest {
     @Test
     void sat_numerous() throws IOException {
         SimpleOrderedColoring orderedColoring = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), graphDefinition.getGraphWrapper().getVertexSize());
-        assertTrue(sat(graphDefinition, orderedColoring.getColoring()));
+        assertTrue(sat(graphDefinition, orderedColoring.getColoring().getColors()));
     }
 
     @Test
     void sat_trivial() throws IOException {
         SimpleOrderedColoring orderedColoring = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), 2);
-        assertFalse(sat(graphDefinition, orderedColoring.getColoring()));
+        assertFalse(sat(graphDefinition, orderedColoring.getColoring().getColors()));
     }
 }

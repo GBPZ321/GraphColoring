@@ -13,9 +13,6 @@ The experiment milestones:
 The experiment goals:
 - Let's implement these algorithms and run several simultaneously. Do we get better results when we run multiple and vary the parameters?
 - Let's run them together where they cooperate ("Hey everybody, I found a new lower bound for k you can stop your search and lower it")
-- 
-
-
 
 
 Otherwise the Java project is broken down like so:
