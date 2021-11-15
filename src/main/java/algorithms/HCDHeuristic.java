@@ -64,7 +64,8 @@ public class HCDHeuristic implements ColoringHeuristic {
 
     private void updateUpperBound() {
         int oldUpperBound = upperBound;
-        upperBound = coloring.values().stream().max(Integer::compareTo).get();
+        Optional<Integer> max = coloring.values().stream().max(Integer::compareTo);
+        max.ifPresent(integer -> upperBound = integer);
         finalColoring = new HashMap<>(coloring);
         if(oldUpperBound != upperBound) {
             iterations = STARTING_ITERATIONS;
