@@ -1,10 +1,12 @@
 package utility;
 
 import graph.definition.GraphDefinition;
+import graph.definition.GraphWrapper;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +30,4 @@ public class GraphHelperFunctions {
         }
         return true;
     }
-
-
 }

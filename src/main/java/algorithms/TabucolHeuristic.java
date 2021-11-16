@@ -1,6 +1,7 @@
 package algorithms;
 
-import algorithms.tabucol.TabucolSolution;
+import algorithms.common.Shared;
+import algorithms.common.SolutionWithStatus;
 import algorithms.tabucol.TabucolSubroutine;
 import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
@@ -15,12 +16,15 @@ public class TabucolHeuristic implements ColoringHeuristic {
     private final int L;
     private final float alpha;
     private final int iterations;
+    private final boolean cooperative;
+    private Shared shared;
 
     public TabucolHeuristic(GraphDefinition g) {
         this.graphDefinition = g;
         this.alpha = DEFAULT_ALPHA;
         this.L = DEFAULT_L;
         this.iterations = DEFAULT_ITERATIONS;
+        this.cooperative = false;
     }
 
     public TabucolHeuristic(GraphDefinition g, int iter, float a, int l) {
@@ -28,6 +32,16 @@ public class TabucolHeuristic implements ColoringHeuristic {
         alpha = a;
         L = l;
         iterations = iter;
+        cooperative = false;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int iter, float a, int l, boolean isCoop, Shared shared) {
+        graphDefinition = g;
+        alpha = a;
+        L = l;
+        iterations = iter;
+        cooperative = isCoop;
+        this.shared = shared;
     }
 
     @Override
@@ -35,8 +49,11 @@ public class TabucolHeuristic implements ColoringHeuristic {
         GraphSolution solution = null;
         int k = graphDefinition.getGraphWrapper().getVertexSize();
         while(k > 1) {
+            if(cooperative && shared.getCurrentMinimum().getK() < k) {
+                k = shared.getCurrentMinimum().getK();
+            }
             TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, iterations, DEFAULT_ITERATIONS);
-            TabucolSolution possibleSolution = tabucolSubroutine.findSolution();
+            SolutionWithStatus possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 solution = possibleSolution.getSolution();
             }

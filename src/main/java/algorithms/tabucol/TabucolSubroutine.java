@@ -1,5 +1,6 @@
 package algorithms.tabucol;
 
+import algorithms.common.SolutionWithStatus;
 import algorithms.random.SimpleOrderedColoring;
 import datastructures.pojo.Move;
 import datastructures.SolutionMatrix;
@@ -27,12 +28,12 @@ public class TabucolSubroutine {
         this.tieBreaker = new Random();
     }
 
-    public TabucolSolution findSolution() {
+    public SolutionWithStatus findSolution() {
         int runs = iterations;
         SimpleOrderedColoring rndColor = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), k);
         VertexColoringAlgorithm.Coloring<Integer> coloring = rndColor.getColoring();
         solutionMatrix = new SolutionMatrix(coloring.getColors(), coloring.getNumberColors(), graphDefinition);
-        TabucolSolution tabucolSolution = new TabucolSolution();
+        SolutionWithStatus tabucolSolution = new SolutionWithStatus();
         while(true) {
             runs--;
             if(runs == 0) {

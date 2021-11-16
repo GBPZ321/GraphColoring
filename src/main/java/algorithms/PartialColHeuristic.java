@@ -1,8 +1,12 @@
 package algorithms;
 
+import algorithms.common.SolutionWithStatus;
+import algorithms.partialcol.PartialColSubroutine;
+import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
+import graph.solution.GraphSolution;
 
-public class PartialColHeuristic {
+public class PartialColHeuristic implements ColoringHeuristic {
     private final GraphDefinition graphDefinition;
     private static final Integer DEFAULT_ITERATIONS = 100000;
     private static final Float DEFAULT_ALPHA = .6f;
@@ -26,5 +30,21 @@ public class PartialColHeuristic {
     }
 
 
-
+    @Override
+    public GraphSolution getColoring() {
+        GraphSolution solution = null;
+        int k = 45;
+        while(k > 1) {
+            PartialColSubroutine partialColSubroutine = new PartialColSubroutine(graphDefinition, k, alpha, L, DEFAULT_ITERATIONS);
+            SolutionWithStatus possibleSolution = partialColSubroutine.findSolution();
+            if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
+                solution = possibleSolution.getSolution();
+            }
+            if(possibleSolution.getStatus() == ColoringStatus.TIMEOUT) {
+                return solution;
+            }
+            k--;
+        }
+        return solution;
+    }
 }

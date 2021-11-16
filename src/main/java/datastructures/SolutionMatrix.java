@@ -1,6 +1,7 @@
 package datastructures;
 
 import graph.definition.GraphDefinition;
+import graph.definition.GraphWrapper;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class SolutionMatrix {
         int sum = 0;
 
         for(int adjacent : neighbors) {
+            if(!c.containsKey(adjacent)) continue; // PARTIALCOL
             if(c.get(adjacent).equals(color)) {
                 sum++;
             }
@@ -66,7 +68,38 @@ public class SolutionMatrix {
         return -matrix.getValue(vertex - 1, newColor) + matrix.getValue(vertex - 1, oldColor);
     }
 
-    public int getMatrixEntry(int row, int col) {
-        return matrix.getValue(row, col);
+    public void updateCForPartialCol(Integer vertex, int j) {
+        GraphWrapper wrapper = definition.getGraphWrapper();
+        for(int u : wrapper.getNeighborsOfV(vertex)) {
+            matrix.increment(u - 1, j);
+            if(!coloring.containsKey(u)) {
+                continue;
+            }
+            if(coloring.get(u) == j) {
+                for(int w : wrapper.getNeighborsOfV(u)) {
+                    matrix.decrement(w - 1, j);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Get RC value for mat.
+     * @param vertex - vertex - 1 based
+     * @param color - color
+     * @return - matrix value
+     */
+    public int getMatrixEntry(int vertex, int color) {
+        return matrix.getValue(vertex, color);
+    }
+
+    /**
+     * Set RC value for mat.
+     * @param vertex - vertex - 1 based
+     * @param color - color
+     */
+    public void setMatrixEntry(int vertex, int color, int value) {
+        matrix.setValue(vertex - 1, color, value);
     }
 }
