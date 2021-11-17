@@ -1,5 +1,6 @@
 package algorithms.random;
 
+import algorithms.interfaces.SeedingStrategy;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 import org.jgrapht.graph.DefaultEdge;
@@ -13,7 +14,7 @@ import java.util.Map;
  * Colors must be ordered from [1...n]
  * Does not usually produce a valid coloring unless k >= |V|
  */
-public class SimpleOrderedColoring implements VertexColoringAlgorithm<Integer> {
+public class SimpleOrderedColoring implements SeedingStrategy {
     private final Integer k;
     private final Graph<Integer, DefaultEdge> graph;
 
@@ -23,11 +24,11 @@ public class SimpleOrderedColoring implements VertexColoringAlgorithm<Integer> {
     }
 
     @Override
-    public Coloring<Integer> getColoring() {
+    public Map<Integer, Integer> getStartingColoring() {
         Map<Integer, Integer> coloring = new HashMap<>();
         for(Integer vertex : graph.vertexSet()) {
             coloring.put(vertex, (vertex - 1) % k);
         }
-        return new ColoringImpl<>(coloring, k);
+        return coloring;
     }
 }

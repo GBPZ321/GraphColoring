@@ -1,6 +1,8 @@
 package algorithms.partialcol;
 
+import algorithms.interfaces.MovePickingStrategy;
 import algorithms.interfaces.Subroutine;
+import algorithms.movepicking.PartialColFeasibleMove;
 import datastructures.pojo.SolutionWithStatus;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
@@ -16,29 +18,32 @@ public class PartialColSubroutine implements Subroutine {
     private final GraphWrapper graphWrapper;
     private final int k;
     private final int iterations;
-    private SolutionMatrix solutionMatrix;
+    private final SolutionMatrix solutionMatrix;
     private final TabuStructure tabuStructure;
-    private final Random tieBreaker;
     private int previousTimesEncountered;
     private int previousSz;
+    private final Set<Integer> unsolved;
+    private final Map<Integer, Integer> coloring;
+    private final MovePickingStrategy movePickingStrategy;
 
     public PartialColSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout) {
         this.graphWrapper = graphDefinition.getGraphWrapper();
         this.k = k;
         this.iterations = iterationTimeout;
         this.tabuStructure = new TabuStructure(l, alpha);
-        this.tieBreaker = new Random();
         this.previousTimesEncountered = 0;
         this.previousSz = 0;
+        PartialColStartingColoring startingColoring = new PartialColStartingColoring(graphWrapper, k);
+        PartialColStarterKit starterKit = startingColoring.getColoring();
+        this.coloring = starterKit.getStartingColorings();
+        this.unsolved = starterKit.getU();
+        this.solutionMatrix = new SolutionMatrix(coloring, k, graphWrapper);
+        this.movePickingStrategy = new PartialColFeasibleMove(unsolved, k, solutionMatrix, tabuStructure);
     }
 
     public SolutionWithStatus findSolution() {
         int runs = iterations;
-        PartialColStartingColoring startingColoring = new PartialColStartingColoring(graphWrapper, k);
-        PartialColStarterKit starterKit = startingColoring.getColoring();
-        Map<Integer, Integer> coloring = starterKit.getStartingColorings();
-        Set<Integer> unsolved = starterKit.getU();
-        solutionMatrix = new SolutionMatrix(coloring, k, graphWrapper);
+
         SolutionWithStatus solutionWithStatus = new SolutionWithStatus();
         while(true) {
             runs--;
@@ -63,38 +68,7 @@ public class PartialColSubroutine implements Subroutine {
     }
 
     private void findBestMoveAndUpdateMatrices(Map<Integer, Integer> coloring, Set<Integer> unsolved) {
-        int max = Integer.MAX_VALUE;
-        List<Move> bestMoves = new ArrayList<>();
-        List<Move> moves = new ArrayList<>();
-
-        for(Integer vertex : unsolved) {
-            for(int kTest = 0; kTest < k; ++kTest) {
-                Move move = new Move(vertex, kTest);
-                moves.add(move);
-                int costOfMove = unsolved.size() + solutionMatrix.getMatrixEntry(vertex - 1, kTest) - 1;
-                if(costOfMove == 0) {
-                    bestMoves.add(move);
-                    break;
-                }
-                if(tabuStructure.isInTabuMatrix(vertex, kTest) ) {
-                    continue;
-                }
-                if(costOfMove == max) {
-                    bestMoves.add(move);
-                } else if(costOfMove < max) {
-                    bestMoves.clear();
-                    bestMoves.add(move);
-                    max = costOfMove;
-                }
-            }
-        }
-
-        Move bestMove = null;
-        if(!bestMoves.isEmpty()) {
-            bestMove = bestMoves.get(tieBreaker.nextInt(bestMoves.size()));
-        } else {
-            bestMove = moves.get(tieBreaker.nextInt(moves.size()));
-        }
+        Move bestMove = movePickingStrategy.findBestMove();
         tabuStructure.insertTabuColor(previousTimesEncountered, bestMove.getVertex(), bestMove.getColor());
         coloring.put(bestMove.getVertex(), bestMove.getColor());
         solutionMatrix.updateCForPartialCol(bestMove.getVertex(), bestMove.getColor());
@@ -106,9 +80,7 @@ public class PartialColSubroutine implements Subroutine {
                 unsolved.add(n);
             }
         }
-
         unsolved.remove(bestMove.getVertex());
-
     }
 
 }

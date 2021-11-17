@@ -1,4 +1,5 @@
 import algorithms.HCDHeuristic;
+import algorithms.MetropolisHeuristic;
 import algorithms.PartialColHeuristic;
 import algorithms.TabucolHeuristic;
 import algorithms.interfaces.ColoringHeuristic;
@@ -10,6 +11,7 @@ import reader.GraphReader;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static utility.GraphHelperFunctions.sat;
@@ -20,7 +22,8 @@ public class GraphCreator {
         GraphReader reader = new DimacsReader();
         String name = "dsjc250.5.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
-        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
+//        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
+        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
         for(ColoringHeuristic heuristic : heuristics) {
             GraphSolution solution = heuristic.getColoring();
             System.out.println(solution.getK());

@@ -1,6 +1,7 @@
 package algorithms.tabucol;
 
 import algorithms.interfaces.MovePickingStrategy;
+import algorithms.interfaces.SeedingStrategy;
 import algorithms.interfaces.Subroutine;
 import algorithms.movepicking.SolutionMatrixMinimizationMove;
 import datastructures.pojo.SolutionWithStatus;
@@ -25,14 +26,12 @@ public class TabucolSubroutine implements Subroutine {
     private final Map<Integer, Integer> startingColoring;
     private final MovePickingStrategy strategy;
 
-    public TabucolSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout) {
+    public TabucolSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout, SeedingStrategy seedingStrategy) {
         this.graphWrapper = graphDefinition.getGraphWrapper();
         this.k = k;
         this.iterations = iterationTimeout;
         this.tabuStructure = new TabuStructure(l, alpha);
-        SimpleOrderedColoring rndColor = new SimpleOrderedColoring(graphDefinition.getGraphWrapper().getGraph(), k);
-        VertexColoringAlgorithm.Coloring<Integer> coloring = rndColor.getColoring();
-        this.startingColoring = coloring.getColors();
+        this.startingColoring = seedingStrategy.getStartingColoring();
         this.solutionMatrix = new SolutionMatrix(startingColoring, k, graphWrapper);
         this.strategy = new SolutionMatrixMinimizationMove(graphWrapper.getVertices(), startingColoring, k, solutionMatrix, tabuStructure);
     }

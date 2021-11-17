@@ -1,11 +1,13 @@
 package algorithms;
 
 import algorithms.interfaces.ColoringHeuristic;
+import algorithms.random.SimpleOrderedColoring;
 import datastructures.common.Shared;
 import datastructures.pojo.SolutionWithStatus;
 import algorithms.tabucol.TabucolSubroutine;
 import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
+import graph.definition.GraphWrapper;
 import graph.solution.GraphSolution;
 
 public class TabucolHeuristic implements ColoringHeuristic {
@@ -48,12 +50,13 @@ public class TabucolHeuristic implements ColoringHeuristic {
     @Override
     public GraphSolution getColoring() {
         GraphSolution solution = null;
-        int k = graphDefinition.getGraphWrapper().getVertexSize();
+        GraphWrapper graphWrapper = graphDefinition.getGraphWrapper();
+        int k = graphWrapper.getVertexSize();
         while(k > 1) {
             if(cooperative && shared.getCurrentMinimum().getK() < k) {
                 k = shared.getCurrentMinimum().getK();
             }
-            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, iterations, DEFAULT_ITERATIONS);
+            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, iterations, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k));
             SolutionWithStatus possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 solution = possibleSolution.getSolution();
