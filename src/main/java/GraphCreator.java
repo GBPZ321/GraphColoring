@@ -28,6 +28,7 @@ public class GraphCreator {
             GraphSolution solution = heuristic.getColoring();
             System.out.println(solution.getK());
             System.out.println(heuristic.getName());
+            System.out.println(sat(testGraph, solution.getColoring()));
         }
 //        PartialColHeuristic heuristic = new PartialColHeuristic(testGraph);
 //        GraphSolution solution = heuristic.getColoring();
