@@ -1,7 +1,8 @@
 package algorithms;
 
-import algorithms.common.Shared;
-import algorithms.common.SolutionWithStatus;
+import algorithms.interfaces.ColoringHeuristic;
+import datastructures.common.Shared;
+import datastructures.pojo.SolutionWithStatus;
 import algorithms.tabucol.TabucolSubroutine;
 import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
@@ -63,6 +64,11 @@ public class TabucolHeuristic implements ColoringHeuristic {
             k--;
         }
         return solution;
+    }
+
+    @Override
+    public String getName() {
+        return "Tabucol";
     }
 
 }

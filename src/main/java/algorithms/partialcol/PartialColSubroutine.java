@@ -1,6 +1,7 @@
 package algorithms.partialcol;
 
-import algorithms.common.SolutionWithStatus;
+import algorithms.interfaces.Subroutine;
+import datastructures.pojo.SolutionWithStatus;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
 import datastructures.pojo.ColoringStatus;
@@ -8,12 +9,11 @@ import datastructures.pojo.Move;
 import graph.definition.GraphDefinition;
 import graph.definition.GraphWrapper;
 import graph.solution.GraphSolution;
-import org.jgrapht.alg.interfaces.VertexColoringAlgorithm;
 
 import java.util.*;
 
-public class PartialColSubroutine {
-    private final GraphDefinition graphDefinition;
+public class PartialColSubroutine implements Subroutine {
+    private final GraphWrapper graphWrapper;
     private final int k;
     private final int iterations;
     private SolutionMatrix solutionMatrix;
@@ -23,7 +23,7 @@ public class PartialColSubroutine {
     private int previousSz;
 
     public PartialColSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout) {
-        this.graphDefinition = graphDefinition;
+        this.graphWrapper = graphDefinition.getGraphWrapper();
         this.k = k;
         this.iterations = iterationTimeout;
         this.tabuStructure = new TabuStructure(l, alpha);
@@ -34,11 +34,11 @@ public class PartialColSubroutine {
 
     public SolutionWithStatus findSolution() {
         int runs = iterations;
-        PartialColStartingColoring startingColoring = new PartialColStartingColoring(graphDefinition.getGraphWrapper(), k);
+        PartialColStartingColoring startingColoring = new PartialColStartingColoring(graphWrapper, k);
         PartialColStarterKit starterKit = startingColoring.getColoring();
         Map<Integer, Integer> coloring = starterKit.getStartingColorings();
         Set<Integer> unsolved = starterKit.getU();
-        solutionMatrix = new SolutionMatrix(coloring, k, graphDefinition);
+        solutionMatrix = new SolutionMatrix(coloring, k, graphWrapper);
         SolutionWithStatus solutionWithStatus = new SolutionWithStatus();
         while(true) {
             runs--;
@@ -98,7 +98,7 @@ public class PartialColSubroutine {
         tabuStructure.insertTabuColor(previousTimesEncountered, bestMove.getVertex(), bestMove.getColor());
         coloring.put(bestMove.getVertex(), bestMove.getColor());
         solutionMatrix.updateCForPartialCol(bestMove.getVertex(), bestMove.getColor());
-        List<Integer> neighborsOfV = graphDefinition.getGraphWrapper().getNeighborsOfV(bestMove.getVertex());
+        List<Integer> neighborsOfV = graphWrapper.getNeighborsOfV(bestMove.getVertex());
         for(Integer n : neighborsOfV) {
             if(!coloring.containsKey(n)) continue;
             if(coloring.get(n).equals(bestMove.getColor())) {

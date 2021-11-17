@@ -1,9 +1,7 @@
-package algorithms.common;
+package datastructures.common;
 
-import algorithms.random.SimpleOrderedColoring;
 import graph.solution.GraphSolution;
 
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

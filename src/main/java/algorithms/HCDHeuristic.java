@@ -1,5 +1,6 @@
 package algorithms;
 
+import algorithms.interfaces.ColoringHeuristic;
 import datastructures.pojo.PriorityVertex;
 import graph.definition.GraphWrapper;
 import graph.solution.GraphSolution;
@@ -130,5 +131,10 @@ public class HCDHeuristic implements ColoringHeuristic {
     public GraphSolution getColoring() {
         this.run();
         return new GraphSolution(finalColoring, upperBound);
+    }
+
+    @Override
+    public String getName() {
+        return "HCD";
     }
 }

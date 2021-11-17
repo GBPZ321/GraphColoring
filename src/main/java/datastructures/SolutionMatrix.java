@@ -8,15 +8,15 @@ import java.util.Map;
 
 public class SolutionMatrix {
     private final Map<Integer, Integer> coloring;
-    private final GraphDefinition definition;
+    private final GraphWrapper wrapper;
     private final int n;
     private final int k;
     private final Matrix matrix;
 
-    public SolutionMatrix(Map<Integer, Integer> coloring, int k, GraphDefinition definition) {
+    public SolutionMatrix(Map<Integer, Integer> coloring, int k, GraphWrapper wrapper) {
         this.coloring = coloring;
-        this.definition = definition;
-        this.n = definition.getGraphWrapper().getVertexSize();
+        this.wrapper = wrapper;
+        this.n = wrapper.getVertexSize();
         this.k = k;
         this.matrix = new Matrix(n, k);
         initializeMatrix();
@@ -26,7 +26,7 @@ public class SolutionMatrix {
         for(int v = 0; v < n; ++v) {
             for(int z = 0; z < k; ++z) {
                 int vertex = v + 1;
-                List<Integer> neighbors = definition.getGraphWrapper().getNeighborsOfV(vertex);
+                List<Integer> neighbors = wrapper.getNeighborsOfV(vertex);
                 int gamma = gamma(coloring, z, neighbors);
                 matrix.setValue(v, z, gamma);
             }
@@ -34,7 +34,7 @@ public class SolutionMatrix {
     }
 
     public void updateSolution(int vertex, int oldColor, int newColor) {
-        List<Integer> neighborsOfV = definition.getGraphWrapper().getNeighborsOfV(vertex);
+        List<Integer> neighborsOfV = wrapper.getNeighborsOfV(vertex);
         for(int w : neighborsOfV) {
             int wLabel = w - 1;
             matrix.getValue(wLabel, newColor);
@@ -69,7 +69,6 @@ public class SolutionMatrix {
     }
 
     public void updateCForPartialCol(Integer vertex, int j) {
-        GraphWrapper wrapper = definition.getGraphWrapper();
         for(int u : wrapper.getNeighborsOfV(vertex)) {
             matrix.increment(u - 1, j);
             if(!coloring.containsKey(u)) {

@@ -27,7 +27,7 @@ public class SolutionMatrixTest {
         coloring.put(1, 0);
         coloring.put(2, 1);
         coloring.put(3, 0);
-        SolutionMatrix matrix = new SolutionMatrix(coloring, numberOfColors, simpleGraph);
+        SolutionMatrix matrix = new SolutionMatrix(coloring, numberOfColors, simpleGraph.getGraphWrapper());
 
         assertEquals(1, matrix.getMatrixEntry(0,0));
         assertEquals(2, matrix.getMatrixEntry(1, 0));

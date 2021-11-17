@@ -1,6 +1,7 @@
 package algorithms;
 
-import algorithms.common.SolutionWithStatus;
+import algorithms.interfaces.ColoringHeuristic;
+import datastructures.pojo.SolutionWithStatus;
 import algorithms.partialcol.PartialColSubroutine;
 import datastructures.pojo.ColoringStatus;
 import graph.definition.GraphDefinition;
@@ -46,5 +47,10 @@ public class PartialColHeuristic implements ColoringHeuristic {
             k--;
         }
         return solution;
+    }
+
+    @Override
+    public String getName() {
+        return "PartialCol";
     }
 }

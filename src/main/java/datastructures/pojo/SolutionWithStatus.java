@@ -1,4 +1,4 @@
-package algorithms.common;
+package datastructures.pojo;
 
 import datastructures.pojo.ColoringStatus;
 import graph.solution.GraphSolution;
