@@ -11,9 +11,13 @@ import graph.solution.GraphSolution;
 
 public class MetropolisHeuristic implements ColoringHeuristic {
     private final GraphWrapper wrapper;
+    private final double beta;
+    private final int iterations;
 
-    public MetropolisHeuristic(GraphDefinition definition) {
+    public MetropolisHeuristic(GraphDefinition definition, double beta, int iterations) {
+        this.beta = beta;
         this.wrapper = definition.getGraphWrapper();
+        this.iterations = iterations;
     }
 
     @Override
@@ -21,7 +25,7 @@ public class MetropolisHeuristic implements ColoringHeuristic {
         int k = wrapper.getVertexSize();
         GraphSolution coloring = null;
         while(k > 1) {
-            MetropolisSubroutine subroutine = new MetropolisSubroutine(wrapper, 100000, new SimpleOrderedColoring(wrapper.getGraph(), k),  k, .75);
+            MetropolisSubroutine subroutine = new MetropolisSubroutine(wrapper, iterations, new SimpleOrderedColoring(wrapper.getGraph(), k),  k, beta);
             SolutionWithStatus solutionWithStatus = subroutine.findSolution();
             if(solutionWithStatus.getStatus() == ColoringStatus.SATISFIED) {
                 coloring = solutionWithStatus.getSolution();

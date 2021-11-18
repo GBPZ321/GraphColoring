@@ -1,28 +1,16 @@
-import algorithms.HCDHeuristic;
-import algorithms.MetropolisHeuristic;
-import algorithms.PartialColHeuristic;
-import algorithms.TabucolHeuristic;
 import algorithms.genetic.SimpleGeneticSubroutine;
-import algorithms.interfaces.ColoringHeuristic;
-import algorithms.partialcol.PartialColSubroutine;
 import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
-import graph.solution.GraphSolution;
 import reader.DimacsReader;
 import reader.GraphReader;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static utility.GraphHelperFunctions.sat;
 
 public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        String name = "jean.col";
+        String name = "graphs/jean.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));

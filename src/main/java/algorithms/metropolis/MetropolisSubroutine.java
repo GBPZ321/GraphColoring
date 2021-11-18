@@ -18,7 +18,7 @@ public class MetropolisSubroutine implements Subroutine {
     private final int iterations;
     private final int k;
     private final Map<Integer, Integer> coloring;
-    private SolutionMatrix matrix;
+    private final SolutionMatrix matrix;
     private static final Random rnd = new Random();
     private final double beta;
 
