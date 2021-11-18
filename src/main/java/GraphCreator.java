@@ -2,8 +2,10 @@ import algorithms.HCDHeuristic;
 import algorithms.MetropolisHeuristic;
 import algorithms.PartialColHeuristic;
 import algorithms.TabucolHeuristic;
+import algorithms.genetic.SimpleGeneticSubroutine;
 import algorithms.interfaces.ColoringHeuristic;
 import algorithms.partialcol.PartialColSubroutine;
+import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
 import graph.solution.GraphSolution;
 import reader.DimacsReader;
@@ -20,16 +22,20 @@ public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        String name = "dsjc250.5.col";
+        String name = "jean.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
-        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
-        for(ColoringHeuristic heuristic : heuristics) {
-            GraphSolution solution = heuristic.getColoring();
-            System.out.println(solution.getK());
-            System.out.println(heuristic.getName());
-            System.out.println(sat(testGraph, solution.getColoring()));
-        }
+//        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
+//        for(ColoringHeuristic heuristic : heuristics) {
+//            GraphSolution solution = heuristic.getColoring();
+//            System.out.println(solution.getK());
+//            System.out.println(heuristic.getName());
+//            System.out.println(sat(testGraph, solution.getColoring()));
+//        }
+
+        SimpleGeneticSubroutine simpleGeneticSubroutine = new SimpleGeneticSubroutine(testGraph.getGraphWrapper(), 500, 10, 20000);
+        SolutionWithStatus status = simpleGeneticSubroutine.findSolution();
+        System.out.println(status);
 //        PartialColHeuristic heuristic = new PartialColHeuristic(testGraph);
 //        GraphSolution solution = heuristic.getColoring();
 //        System.out.println("Test");

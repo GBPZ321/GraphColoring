@@ -17,3 +17,5 @@ See page 35. It gives some directions we could go in.
 https://troja.uksw.edu.pl/pdf/kaeiog/KAEiOG2006.87-95.pdf
 
 Gives some more ideas. 
+
+http://ceur-ws.org/Vol-841/submission_10.pdf
