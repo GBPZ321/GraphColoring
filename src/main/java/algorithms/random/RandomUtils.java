@@ -38,4 +38,13 @@ public class RandomUtils {
                 .mapToObj(list::get)
                 .collect(Collectors.toList());
     }
+
+    public static List<Double> getNRandomDoublesInRange(double low, double high, int n) {
+        return
+                rand.doubles(low, high)
+                        .distinct()
+                        .limit(n)
+                        .boxed()
+                        .collect(Collectors.toList());
+    }
 }
