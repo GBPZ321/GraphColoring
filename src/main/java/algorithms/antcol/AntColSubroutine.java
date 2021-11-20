@@ -14,10 +14,10 @@ import org.jgrapht.graph.SimpleGraph;
 
 import java.lang.reflect.Array;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AntColSubroutine implements Subroutine {
 
@@ -60,8 +60,7 @@ public class AntColSubroutine implements Subroutine {
     private Integer k;
     private Integer numberOfClashes;
     private boolean isFeasible = false;
-    private ArrayList<Integer> bestFoundSolution;
-    private ArrayList<Integer> currentSolution;
+    private final List<List<Integer>> solutions;
 
     private ArrayList<Integer> degrees;
     private PheremoneMatrix localPheremoneDelta;
@@ -76,6 +75,9 @@ public class AntColSubroutine implements Subroutine {
         this.targetColors = targetColors;
         this.degrees = new ArrayList<>();
         this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
+        this.solutions = Stream.generate(ArrayList<Integer>::new)
+                .limit(k)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -98,15 +100,21 @@ public class AntColSubroutine implements Subroutine {
 
     private boolean buildSolution() {
 
+        boolean solutionIsComplete = true;
         Integer numberColored = 0;
+        Integer colSolutionIndex = 0;
 
         ArrayList<ArrayList<Integer>> tempX = new ArrayList<>();
         ArrayList<ArrayList<Integer>> tempY = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> independentSets = new ArrayList<>(Collections.nCopies(numberOfMultisets, new ArrayList<>()));
+        List<List<Integer>> independentSets = Stream.generate(ArrayList<Integer>::new)
+                .limit(numberOfMultisets)
+                .collect(Collectors.toList());
         ArrayList<Double> tauEta;
         Double tauEtaTotal;
         Double tau;
         Double eta;
+
+        Random random = new Random();
 
         // X keeps track of all nodes that have/haven't been assigned. It also holds the
         // degrees of the subgraph introduced by X. When a node is assigned a color,
@@ -135,13 +143,12 @@ public class AntColSubroutine implements Subroutine {
             // Create copies of X and Y as placeholders for the independent sets
             // that will be produced.
             for (int i = 0; i < numberOfMultisets; i++) {
-                tempX.add(X);
-                tempY.add(Y);
+                tempX.add(new ArrayList<>(X));
+                tempY.add(new ArrayList<>(Y));
                 independentSets.get(i).clear();
             }
 
             for (int iset = 0; iset < numberOfMultisets; iset++) {
-                Random random = new Random();
                 ArrayList<Integer> updatedTempXISet = tempX.get(iset);
                 ArrayList<Integer> updatedTempYISet = tempY.get(iset);
 
@@ -160,11 +167,11 @@ public class AntColSubroutine implements Subroutine {
                 // Update the independent set by removing adjacent nodes from this vertex.
                 updatedTempYISet = removeAdjacentNodes(updatedTempYISet, vertex);
                 System.out.println("updated tempYISet = " + updatedTempYISet);
-
                 tempY.set(iset, updatedTempYISet);
-                updatedTempXISet = updateX(updatedTempXISet, vertex);
 
+                updatedTempXISet = updateX(updatedTempXISet, vertex);
                 System.out.println("updated tempXISet = " + updatedTempXISet);
+                tempX.set(iset, updatedTempXISet);
 
                 // Choose the remaining nodes in the current Y independent set based on the following:
                 // 1. Pheremone (which is measured by `tau`), and
@@ -174,9 +181,9 @@ public class AntColSubroutine implements Subroutine {
                     tauEtaTotal = 0.0;
 
                     for (int i = 0; i < updatedTempYISet.size(); i++) {
-                        // Calculate tau.
+                        // Calculate tau (τ).
                         tau = 0.0;
-                        ArrayList<Integer> independentSet = independentSets.get(iset);
+                        List<Integer> independentSet = independentSets.get(iset);
                         for (int j = 0; j < independentSet.size(); j++) {
                             int rowIndex = independentSet.get(j);
                             int colIndex = updatedTempYISet.get(i);
@@ -187,7 +194,7 @@ public class AntColSubroutine implements Subroutine {
                         tau = Math.pow(tau, alpha);
                         System.out.println("tau = " + tau);
 
-                        // Now, calculate eta values.
+                        // Now, calculate eta (η) values.
                         numberOfConstraintChecks++;
                         eta = (double)updatedTempXISet.get(updatedTempYISet.get(i));
                         eta = Math.pow(eta, beta);
@@ -200,12 +207,64 @@ public class AntColSubroutine implements Subroutine {
                         System.out.println("tauEtaTotal = " + tauEtaTotal);
                     }
 
-                    // TODO
+                    // After calculating our tau eta combos, select an element
+                    // in this iset.
+                    int selectedIndex = randomIndexUsingTauEta(tauEta, tauEtaTotal);
+                    int selectedVertex = updatedTempYISet.get(selectedIndex) + 1;
+                    independentSets.get(iset).add(selectedVertex);
+
+                    updatedTempYISet = removeAdjacentNodes(updatedTempYISet, selectedVertex);
+                    tempY.set(iset, updatedTempYISet);
+
+                    updatedTempXISet = updateX(updatedTempXISet, selectedVertex);
+                    tempX.set(iset, updatedTempXISet);
+
+                }
+
+                // At this point, we've created an appropriate number of independent sets.
+                // Pick the one that results in the least number of edges in the remaining
+                // uncolored vertices.
+                int indexToSelect = chooseMinimumEdges(tempX);
+                List<Integer> selectedISet = independentSets.get(indexToSelect);
+
+                // Assign these vertices to S[col].
+                numberColored += selectedISet.size();
+                solutions.set(colSolutionIndex, selectedISet);
+                X = tempX.get(indexToSelect);
+
+                colSolutionIndex++;
+                if (colSolutionIndex == k && numberColored < graphDefinition.getGraphWrapper().getNumberOfVertices()) {
+                    solutionIsComplete = false;
+                    break;
                 }
             }
         }
 
-        return false;
+        // At this point, we have produced a (possibly partial) k-coloring.
+        // Remove empty color classes.
+        int i = 0;
+        while (i < solutions.size()) {
+            if (solutions.get(i).isEmpty()) {
+                solutions.remove(i);
+            }
+            else {
+                i++;
+            }
+        }
+
+        if (!solutionIsComplete) {
+            // The solution is incomplete. Randomly assign uncolored nodes and return.
+            for (i = 0; i < graphDefinition.getGraphWrapper().getNumberOfVertices(); i++) {
+                if (X.get(i) >= 0) {
+                    solutions.get(random.nextInt(solutions.size())).add(i);
+                }
+            }
+            return false;
+        }
+        else {
+            // We have found a feasible solution.
+            return true;
+        }
     }
 
     /**
@@ -270,6 +329,62 @@ public class AntColSubroutine implements Subroutine {
         System.out.println("updateX: Updated X = " + result);
 
         return result;
+    }
+
+    private int randomIndexUsingTauEta(ArrayList<Double> tauEta, Double tauEtaTotal) {
+        Random random = new Random();
+        if (tauEta.size() == 1) { return 0; }
+        if (tauEtaTotal == 0) { return random.nextInt(tauEta.size()); }
+
+        // According to docs/C++ source, we simulate a "roulette" wheel
+        // and pick a value at random.
+
+        // Choose a value between [0, 1) and multiply against tauEtaTotal.
+        // We then iterate through the list of tauEtas to see where this
+        // value "lands" across the spectrum of values via bounds.
+        double accumulator = 0.0;
+        double selectedValue = ThreadLocalRandom.current().nextDouble(1.0) * tauEtaTotal;
+        selectedValue = 0.13153778808191419 * tauEtaTotal; // FIXME
+        for (Double tauEtaValue : tauEta) {
+            if (accumulator <= selectedValue && selectedValue <= (accumulator + tauEtaValue)) {
+                return tauEta.indexOf(tauEtaValue);
+            }
+            else {
+                accumulator += tauEtaValue;
+            }
+        }
+
+        // This is an edge case where the value we're attempting to select at this point is
+        // incredibly miniscule. This can be due to multiple reductions in tau etas due to
+        // evaporation. Since it is not strictly 0, it's still worth selecting this value if it exists.
+        for (Double tauEtaValue : tauEta) {
+            if (tauEtaValue > 0.0) { return tauEta.indexOf(tauEtaValue); }
+        }
+
+        // Last resort: simply choose a value uniformly.
+        return random.nextInt(tauEta.size());
+    }
+
+    private int chooseMinimumEdges(ArrayList<ArrayList<Integer>> tempX) {
+        int minimumIndex = 0;
+        int minimumDegrees = Integer.MAX_VALUE;
+        for (int i = 0; i < tempX.size(); i++) {
+            int totalDegrees = 0;
+            for (int j = 0; j < tempX.get(i).size(); j++) {
+                numberOfConstraintChecks++;
+                int degree = tempX.get(i).get(j);
+                if (degree >= 0) {
+                    totalDegrees += degree;
+                }
+            }
+
+            if (totalDegrees < minimumDegrees) {
+                minimumDegrees = totalDegrees;
+                minimumIndex = i;
+            }
+        }
+
+        return minimumIndex;
     }
 
     private void prepare() {
