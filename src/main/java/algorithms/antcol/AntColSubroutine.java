@@ -3,6 +3,7 @@ package algorithms.antcol;
 import algorithms.interfaces.Subroutine;
 import com.google.common.primitives.UnsignedLong;
 import datastructures.Matrix;
+import datastructures.PheremoneMatrix;
 import datastructures.SolutionMatrix;
 import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
@@ -63,7 +64,7 @@ public class AntColSubroutine implements Subroutine {
     private ArrayList<Integer> currentSolution;
 
     private ArrayList<Integer> degrees;
-    private Matrix localPheremoneDelta;
+    private PheremoneMatrix localPheremoneDelta;
 
     public AntColSubroutine(GraphDefinition graphDefinition, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors) {
         Integer numberOfVertices = graphDefinition.getGraphWrapper().getVertexSize();
@@ -74,7 +75,7 @@ public class AntColSubroutine implements Subroutine {
         this.randomSeed = randomSeed;
         this.targetColors = targetColors;
         this.degrees = new ArrayList<>();
-        this.localPheremoneDelta = new Matrix(numberOfVertices, numberOfVertices);
+        this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
     }
 
     @Override
@@ -101,7 +102,11 @@ public class AntColSubroutine implements Subroutine {
 
         ArrayList<ArrayList<Integer>> tempX = new ArrayList<>();
         ArrayList<ArrayList<Integer>> tempY = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> independentSets = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> independentSets = new ArrayList<>(Collections.nCopies(numberOfMultisets, new ArrayList<>()));
+        ArrayList<Double> tauEta;
+        Double tauEtaTotal;
+        Double tau;
+        Double eta;
 
         // X keeps track of all nodes that have/haven't been assigned. It also holds the
         // degrees of the subgraph introduced by X. When a node is assigned a color,
@@ -126,13 +131,13 @@ public class AntColSubroutine implements Subroutine {
 
             tempX.clear();
             tempY.clear();
-            independentSets.clear();
 
             // Create copies of X and Y as placeholders for the independent sets
             // that will be produced.
             for (int i = 0; i < numberOfMultisets; i++) {
                 tempX.add(X);
                 tempY.add(Y);
+                independentSets.get(i).clear();
             }
 
             for (int iset = 0; iset < numberOfMultisets; iset++) {
@@ -147,6 +152,7 @@ public class AntColSubroutine implements Subroutine {
                 Integer randomIndex = random.nextInt(updatedTempYISet.size()) + 1;
                 randomIndex = 226 + 1;
                 Integer vertex = updatedTempYISet.get(randomIndex);
+                independentSets.get(iset).add(vertex);
 
                 System.out.println("Random index = " + randomIndex);
                 System.out.println("Vertex picked = " + vertex);
@@ -156,11 +162,46 @@ public class AntColSubroutine implements Subroutine {
                 System.out.println("updated tempYISet = " + updatedTempYISet);
 
                 tempY.set(iset, updatedTempYISet);
-
                 updatedTempXISet = updateX(updatedTempXISet, vertex);
 
                 System.out.println("updated tempXISet = " + updatedTempXISet);
 
+                // Choose the remaining nodes in the current Y independent set based on the following:
+                // 1. Pheremone (which is measured by `tau`), and
+                // 2. The degrees of nodes in the current subgraph induced by the current X independent set.
+                while (!updatedTempYISet.isEmpty()) {
+                    tauEta = new ArrayList(Collections.nCopies(updatedTempYISet.size(), 0));
+                    tauEtaTotal = 0.0;
+
+                    for (int i = 0; i < updatedTempYISet.size(); i++) {
+                        // Calculate tau.
+                        tau = 0.0;
+                        ArrayList<Integer> independentSet = independentSets.get(iset);
+                        for (int j = 0; j < independentSet.size(); j++) {
+                            int rowIndex = independentSet.get(j);
+                            int colIndex = updatedTempYISet.get(i);
+                            tau += localPheremoneDelta.getValue(rowIndex, colIndex);
+                        }
+
+                        tau /= independentSet.size();
+                        tau = Math.pow(tau, alpha);
+                        System.out.println("tau = " + tau);
+
+                        // Now, calculate eta values.
+                        numberOfConstraintChecks++;
+                        eta = (double)updatedTempXISet.get(updatedTempYISet.get(i));
+                        eta = Math.pow(eta, beta);
+                        System.out.println("eta = " + eta);
+
+                        // Finally, combine the two.
+                        tauEta.set(i, tau * eta);
+                        tauEtaTotal += tauEta.get(i);
+
+                        System.out.println("tauEtaTotal = " + tauEtaTotal);
+                    }
+
+                    // TODO
+                }
             }
         }
 
@@ -244,6 +285,6 @@ public class AntColSubroutine implements Subroutine {
 
     private void resetLocalPheremoneDelta() {
         Integer numberOfVertices = graphDefinition.getGraphWrapper().getVertexSize();
-        this.localPheremoneDelta = new Matrix(numberOfVertices, numberOfVertices);
+        this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
     }
 }
