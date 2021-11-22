@@ -10,6 +10,7 @@ public class AntColHeuristic implements ColoringHeuristic {
 
     private final GraphDefinition graphDefinition;
     private static Integer DEFAULT_CONSTRAINT_CHECKS  = 100000000;
+    private static Integer DEFAULT_K  = 250;
     private static Integer DEFAULT_TABU_ITERATIONS = 2;
     private static Integer DEFAULT_RANDOM_SEED = 1;
     private static Integer DEFAULT_TARGET_COLORS = 1;
@@ -32,14 +33,16 @@ public class AntColHeuristic implements ColoringHeuristic {
 
     public AntColHeuristic(GraphDefinition graphDefinition) {
         this(graphDefinition,
+                DEFAULT_K,
                 DEFAULT_CONSTRAINT_CHECKS,
                 DEFAULT_TABU_ITERATIONS,
                 DEFAULT_RANDOM_SEED,
                 DEFAULT_TARGET_COLORS);
     }
 
-    public AntColHeuristic(GraphDefinition graphDefinition, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors) {
+    public AntColHeuristic(GraphDefinition graphDefinition, Integer k, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors) {
         this.graphDefinition = graphDefinition;
+        this.k = k;
         this.constraintChecks = constraintChecks;
         this.tabuIterations = tabuIterations;
         this.randomSeed = randomSeed;
@@ -50,7 +53,7 @@ public class AntColHeuristic implements ColoringHeuristic {
     public GraphSolution getColoring() {
         GraphSolution solution = null;
 
-        AntColSubroutine antColSubroutine = new AntColSubroutine(graphDefinition, constraintChecks, tabuIterations, randomSeed, targetColors);
+        AntColSubroutine antColSubroutine = new AntColSubroutine(graphDefinition, k, constraintChecks, tabuIterations, randomSeed, targetColors);
         SolutionWithStatus possibleSolution = antColSubroutine.findSolution();
 
         return solution;
