@@ -8,11 +8,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Shared {
     private GraphSolution solution;
     private final ReadWriteLock readWriteLock;
+    private final int totalThreads;
+    private int totalTimedOut;
 
-
-    public Shared(int vertices) {
+    public Shared(int vertices, int totalThreads) {
         this.solution = new GraphSolution(null, vertices);
         this.readWriteLock = new ReentrantReadWriteLock();
+        this.totalThreads = totalThreads;
+        this.totalTimedOut = 0;
     }
 
     /**
@@ -25,8 +28,6 @@ public class Shared {
             this.solution = ps;
         }
         readWriteLock.writeLock().unlock();
-
-
     }
 
     /**
@@ -42,4 +43,24 @@ public class Shared {
             readWriteLock.readLock().unlock();
         }
     }
+
+    public synchronized void updateTimeout() {
+        totalTimedOut++;
+    }
+
+    public synchronized void allTimedout() {
+        while(totalThreads != totalTimedOut) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        notifyAll();
+        return;
+    }
+
+
+
 }

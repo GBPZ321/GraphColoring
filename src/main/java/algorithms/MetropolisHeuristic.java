@@ -10,15 +10,14 @@ import graph.definition.GraphDefinition;
 import graph.definition.GraphWrapper;
 import graph.solution.GraphSolution;
 
-import java.util.Objects;
-
-public class MetropolisHeuristic implements ColoringHeuristic {
+public class MetropolisHeuristic extends BaseCooperative implements ColoringHeuristic {
     private final GraphWrapper wrapper;
     private final double beta;
     private final int iterations;
     private final Shared shared;
 
     public MetropolisHeuristic(GraphDefinition definition, double beta, int iterations) {
+
         this.beta = beta;
         this.wrapper = definition.getGraphWrapper();
         this.iterations = iterations;
@@ -37,23 +36,26 @@ public class MetropolisHeuristic implements ColoringHeuristic {
         int k = wrapper.getVertexSize();
         GraphSolution coloring = null;
         while(k > 1) {
+            System.out.println("K = " + k);
+            if(isGlobalKLower(k)) {
+                k = shared.getCurrentMinimum().getK();
+                k--;
+                continue;
+            }
             MetropolisSubroutine subroutine = new MetropolisSubroutine(wrapper, iterations, new SimpleOrderedColoring(wrapper.getGraph(), k),  k, beta);
 
             SolutionWithStatus solutionWithStatus = subroutine.findSolution();
             if(solutionWithStatus.getStatus() == ColoringStatus.SATISFIED) {
                 coloring = solutionWithStatus.getSolution();
-                k--;
-            } else if(solutionWithStatus.getStatus() == ColoringStatus.TIMEOUT) {
-                if(Objects.isNull(shared)) {
-                    return coloring;
-                }
-                int globalK = shared.getCurrentMinimum().getK();
-                if(globalK < k) {
-                    k = globalK;
-                    continue; // New life because a cooperative friend is still running.
-                }
+                updateSolution(solutionWithStatus.getSolution());
+            } else if(isGlobalKLower(k)) {
+                k = shared.getCurrentMinimum().getK();
+            } else if(solutionWithStatus.getStatus() == ColoringStatus.TIMEOUT && isFinished(k)) {
                 return coloring;
+            } else {
+                k = shared.getCurrentMinimum().getK();
             }
+            k--;
         }
         return coloring;
     }

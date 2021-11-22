@@ -33,7 +33,6 @@ public class MetropolisSubroutine implements Subroutine {
 
     @Override
     public SolutionWithStatus findSolution() {
-        System.out.println("Starting solution for k: " + k);
         int runs = iterations;
         List<Integer> vertices = new ArrayList<>(graphWrapper.getVertices());
 

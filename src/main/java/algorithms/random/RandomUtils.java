@@ -47,4 +47,12 @@ public class RandomUtils {
                         .boxed()
                         .collect(Collectors.toList());
     }
+
+    public static List<Integer> getNRandomIntsInRange(int low, int high, int n) {
+        return
+                rand.ints(low, high)
+                        .limit(n)
+                        .boxed()
+                        .collect(Collectors.toList());
+    }
 }

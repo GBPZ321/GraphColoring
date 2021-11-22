@@ -10,41 +10,34 @@ import graph.definition.GraphDefinition;
 import graph.definition.GraphWrapper;
 import graph.solution.GraphSolution;
 
-public class TabucolHeuristic implements ColoringHeuristic {
+import java.util.Objects;
 
+public class TabucolHeuristic extends BaseCooperative implements ColoringHeuristic {
+
+    public static final Integer DEFAULT_ITERATIONS = 100000;
     private final GraphDefinition graphDefinition;
-    private static final Integer DEFAULT_ITERATIONS = 100000;
-    private static final Float DEFAULT_ALPHA = .6f;
+    private static final Double DEFAULT_ALPHA = .6;
     private static final Integer DEFAULT_L = 8;
     private final int L;
-    private final float alpha;
-    private final int iterations;
-    private final boolean cooperative;
-    private Shared shared;
+    private final double alpha;
 
     public TabucolHeuristic(GraphDefinition g) {
         this.graphDefinition = g;
         this.alpha = DEFAULT_ALPHA;
         this.L = DEFAULT_L;
-        this.iterations = DEFAULT_ITERATIONS;
-        this.cooperative = false;
     }
 
-    public TabucolHeuristic(GraphDefinition g, int iter, float a, int l) {
+    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l) {
         graphDefinition = g;
         alpha = a;
         L = l;
-        iterations = iter;
-        cooperative = false;
     }
 
-    public TabucolHeuristic(GraphDefinition g, int iter, float a, int l, boolean isCoop, Shared shared) {
+    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l, Shared shared) {
+        super(shared);
         graphDefinition = g;
         alpha = a;
         L = l;
-        iterations = iter;
-        cooperative = isCoop;
-        this.shared = shared;
     }
 
     @Override
@@ -53,16 +46,22 @@ public class TabucolHeuristic implements ColoringHeuristic {
         GraphWrapper graphWrapper = graphDefinition.getGraphWrapper();
         int k = graphWrapper.getVertexSize();
         while(k > 1) {
-            if(cooperative && shared.getCurrentMinimum().getK() < k) {
+            System.out.println("K = " + k);
+            if(isGlobalKLower(k)) {
                 k = shared.getCurrentMinimum().getK();
+                k--;
+                continue;
             }
-            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, iterations, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k));
+            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k));
             SolutionWithStatus possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 solution = possibleSolution.getSolution();
-            }
-            if(possibleSolution.getStatus() == ColoringStatus.TIMEOUT) {
+            } else if(isGlobalKLower(k)) {
+                k = shared.getCurrentMinimum().getK();
+            } else if(possibleSolution.getStatus() == ColoringStatus.TIMEOUT && isFinished(k)) {
                 return solution;
+            } else {
+                k = shared.getCurrentMinimum().getK();
             }
             k--;
         }

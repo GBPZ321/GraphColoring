@@ -26,7 +26,7 @@ public class TabucolSubroutine implements Subroutine {
     private final Map<Integer, Integer> startingColoring;
     private final MovePickingStrategy strategy;
 
-    public TabucolSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout, SeedingStrategy seedingStrategy) {
+    public TabucolSubroutine(GraphDefinition graphDefinition, int k, double alpha, int l, int iterationTimeout, SeedingStrategy seedingStrategy) {
         this.graphWrapper = graphDefinition.getGraphWrapper();
         this.k = k;
         this.iterations = iterationTimeout;
