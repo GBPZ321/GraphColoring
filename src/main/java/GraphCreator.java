@@ -12,6 +12,11 @@ public class GraphCreator {
         GraphReader reader = new DimacsReader();
         String name = "graphs/jean.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
+
+        AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph);
+        GraphSolution status = antColHeuristic.getColoring();
+        System.out.println(status);
+
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
 //        for(ColoringHeuristic heuristic : heuristics) {
@@ -21,9 +26,9 @@ public class GraphCreator {
 //            System.out.println(sat(testGraph, solution.getColoring()));
 //        }
 
-        SimpleGeneticSubroutine simpleGeneticSubroutine = new SimpleGeneticSubroutine(testGraph.getGraphWrapper(), 500, 10, 20000);
-        SolutionWithStatus status = simpleGeneticSubroutine.findSolution();
-        System.out.println(status);
+//        SimpleGeneticSubroutine simpleGeneticSubroutine = new SimpleGeneticSubroutine(testGraph.getGraphWrapper(), 500, 10, 20000);
+//        SolutionWithStatus status = simpleGeneticSubroutine.findSolution();
+//        System.out.println(status);
 //        PartialColHeuristic heuristic = new PartialColHeuristic(testGraph);
 //        GraphSolution solution = heuristic.getColoring();
 //        System.out.println("Test");
