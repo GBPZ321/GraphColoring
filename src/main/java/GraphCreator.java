@@ -1,6 +1,6 @@
-import algorithms.genetic.SimpleGeneticSubroutine;
-import datastructures.pojo.SolutionWithStatus;
+import algorithms.AntColHeuristic;
 import graph.definition.GraphDefinition;
+import graph.solution.GraphSolution;
 import reader.DimacsReader;
 import reader.GraphReader;
 
@@ -10,8 +10,14 @@ public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        String name = "graphs/jean.col";
+        String name = "graphs/dsjc125.1.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
+
+        AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph, false);
+        GraphSolution solution = antColHeuristic.getColoring();
+        System.out.println(solution.getK());
+        System.out.println(antColHeuristic.getName());
+
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
 //        for(ColoringHeuristic heuristic : heuristics) {
@@ -21,9 +27,9 @@ public class GraphCreator {
 //            System.out.println(sat(testGraph, solution.getColoring()));
 //        }
 
-        SimpleGeneticSubroutine simpleGeneticSubroutine = new SimpleGeneticSubroutine(testGraph.getGraphWrapper(), 500, 10, 20000);
-        SolutionWithStatus status = simpleGeneticSubroutine.findSolution();
-        System.out.println(status);
+//        SimpleGeneticSubroutine simpleGeneticSubroutine = new SimpleGeneticSubroutine(testGraph.getGraphWrapper(), 500, 10, 20000);
+//        SolutionWithStatus status = simpleGeneticSubroutine.findSolution();
+//        System.out.println(status);
 //        PartialColHeuristic heuristic = new PartialColHeuristic(testGraph);
 //        GraphSolution solution = heuristic.getColoring();
 //        System.out.println("Test");

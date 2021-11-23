@@ -20,11 +20,14 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
     private static final Double DEFAULT_ALPHA = .6;
     private static final Integer DEFAULT_L = 8;
     private final int L;
+    private int k;
     private final double alpha;
+    private final int iterations;
     private final StatisticMatrix statisticMatrix;
 
     public TabucolHeuristic(GraphDefinition g) {
         this.graphDefinition = g;
+        this.k = g.getGraphWrapper().getVertexSize();
         this.alpha = DEFAULT_ALPHA;
         this.L = DEFAULT_L;
         this.statisticMatrix = null;
@@ -32,6 +35,8 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
 
     public TabucolHeuristic(GraphDefinition g, double a, int l) {
         graphDefinition = g;
+        this.iterations = DEFAULT_ITERATIONS;
+        this.k = g.getGraphWrapper().getVertexSize();
         alpha = a;
         L = l;
         this.statisticMatrix = null;
@@ -40,16 +45,68 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
     public TabucolHeuristic(GraphDefinition g, double a, int l, Shared shared, StatisticMatrix statisticMatrix) {
         super(shared);
         graphDefinition = g;
+        this.iterations = DEFAULT_ITERATIONS;
+        this.k = g.getGraphWrapper().getVertexSize();
         alpha = a;
         L = l;
         this.statisticMatrix = statisticMatrix;
+    }
+
+    public TabucolHeuristic(GraphDefinition g) {
+        this.graphDefinition = g;
+        this.k = g.getGraphWrapper().getVertexSize();
+        this.alpha = DEFAULT_ALPHA;
+        this.L = DEFAULT_L;
+        this.iterations = DEFAULT_ITERATIONS;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l, Shared shared) {
+        super(shared);
+        graphDefinition = g;
+        this.k = k;
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l) {
+        graphDefinition = g;
+        k = g.getGraphWrapper().getVertexSize();
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l) {
+        graphDefinition = g;
+        this.k = k;
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l, Shared shared) {
+        super(shared);
+        graphDefinition = g;
+        k = g.getGraphWrapper().getVertexSize();
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l, Shared shared) {
+        super(shared);
+        graphDefinition = g;
+        this.k = k;
+        iterations = iter;
+        alpha = a;
+        L = l;
     }
 
     @Override
     public GraphSolution getColoring() {
         GraphSolution solution = null;
         GraphWrapper graphWrapper = graphDefinition.getGraphWrapper();
-        int k = graphWrapper.getVertexSize();
         while(k > 1) {
             System.out.println("K = " + k);
             if(isGlobalKLower(k)) {
