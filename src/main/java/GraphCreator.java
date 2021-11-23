@@ -14,8 +14,10 @@ public class GraphCreator {
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
 
         AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph);
-        GraphSolution status = antColHeuristic.getColoring();
-        System.out.println(status);
+        GraphSolution solution = antColHeuristic.getColoring();
+        System.out.println(solution.getK());
+        System.out.println(antColHeuristic.getName());
+        System.out.println(sat(testGraph, solution.getColoring()));
 
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));

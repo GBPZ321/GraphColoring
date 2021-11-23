@@ -16,20 +16,12 @@ public class AntColHeuristic implements ColoringHeuristic {
     private static Integer DEFAULT_TARGET_COLORS = 1;
 
     private final Integer constraintChecks;
+    private final Integer k;
     private final Integer tabuIterations;
     private final Integer randomSeed;
     private final Integer targetColors;
 
-    private final Double alpha = 2.0;
-    private final Double beta = 3.0;
-    private final Double evaporationRate = 0.75;
-    private final Integer numberOfAnts = 10;
 
-    private Double solutionCost;
-    private Integer k;
-    private Integer numberOfClashes;
-
-    private Boolean isCurrentlyFeasible;
 
     public AntColHeuristic(GraphDefinition graphDefinition) {
         this(graphDefinition,
@@ -51,12 +43,9 @@ public class AntColHeuristic implements ColoringHeuristic {
 
     @Override
     public GraphSolution getColoring() {
-        GraphSolution solution = null;
-
         AntColSubroutine antColSubroutine = new AntColSubroutine(graphDefinition, k, constraintChecks, tabuIterations, randomSeed, targetColors);
-        SolutionWithStatus possibleSolution = antColSubroutine.findSolution();
-
-        return solution;
+        SolutionWithStatus solution = antColSubroutine.findSolution();
+        return solution.getSolution();
     }
 
     @Override

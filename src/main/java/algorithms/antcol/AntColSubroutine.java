@@ -3,6 +3,7 @@ package algorithms.antcol;
 import algorithms.TabucolHeuristic;
 import algorithms.interfaces.Subroutine;
 import datastructures.PheremoneMatrix;
+import datastructures.pojo.ColoringStatus;
 import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
 import graph.definition.GraphWrapper;
@@ -15,7 +16,6 @@ import java.util.stream.Stream;
 
 public class AntColSubroutine implements Subroutine {
 
-//    private final SolutionMatrix solutionMatrix;
     /**
      * The graph.
      */
@@ -51,9 +51,8 @@ public class AntColSubroutine implements Subroutine {
     private Double solutionCost;
     private final Integer numberOfAnts = 10;
     private final Integer numberOfMultisets = 5;
+
     private Integer k;
-    private Integer numberOfClashes;
-    private boolean isFeasible = false;
     private List<List<Integer>> solution;
     private List<List<Integer>> currentBestSolution;
 
@@ -76,24 +75,37 @@ public class AntColSubroutine implements Subroutine {
 
     @Override
     public SolutionWithStatus findSolution() {
+
+        SolutionWithStatus solutionWithStatus = new SolutionWithStatus();
         prepare();
 
         // Iterate until we reach our constraint checking threshold.
         while (numberOfConstraintChecks < constraintChecks) {
+
+            System.out.println("[k=" + k + "] Number of constraint checks remaining: " + (constraintChecks - numberOfConstraintChecks));
             resetLocalPheremoneDelta();
 
             // Iterate through the number of ants. We are attempting to seek a solution using k colors.
             for (int ant = 0; ant < numberOfAnts; ant++) {
-                
+
+                System.out.println("[k=" + k + "] Running ant " + (ant + 1) + " out of " + numberOfAnts + " ants.");
+
                 // Construct an empty solution using a maximum of k colors.
                 resetSolution();
                 
                 boolean solutionIsFeasible = buildSolution();
                 if (!solutionIsFeasible) {
                     // Run TabuCol.
-                    TabucolHeuristic tabucolHeuristic = new TabucolHeuristic(graphDefinition);
+                    System.out.println("[k=" + k + "] Solution is incomplete! Running TabuCol to try to create a feasible solution...");
+                    TabucolHeuristic tabucolHeuristic = new TabucolHeuristic(graphDefinition, k, tabuIterations, 0.6f, 8);
                     GraphSolution tabucolSolution = tabucolHeuristic.getColoring();
                     // TODO: Need conflict count from TabuCol here.
+
+                    // If a solution has been found, we mark it as feasible.
+                    if (tabucolSolution != null && tabucolSolution.getColoring() != null) {
+                        solutionIsFeasible = true;
+                        solution = antColSolutionValue(tabucolSolution.getColoring(), tabucolSolution.getK());
+                    }
                 }
 
                 // Create a solution cost based on feasibility or the number of conflicts from TabuCol.
@@ -109,6 +121,7 @@ public class AntColSubroutine implements Subroutine {
 
                 // We have found a feasible solution using |solution| colors (|solution| ≤ k).
                 if (solutionIsFeasible) {
+                    System.out.println("[k=" + k + "] Feasible solution found for k=" + solution.size() + ".");
                     if (currentBestSolution == null || solution.size() < currentBestSolution.size()) {
                         currentBestSolution = solution;
                     }
@@ -120,12 +133,14 @@ public class AntColSubroutine implements Subroutine {
                 
                 // Additionally, break the cycle if we've exceeded the number of conflict checks.
                 if (numberOfConstraintChecks >= constraintChecks) {
+                    System.out.println("[k=" + k + "] Exceeded number of constraint checks at " + numberOfConstraintChecks + " (limit: " + constraintChecks + ").");
                     break;
                 }
             }
 
             // We have found a solution that is less than or equal to the desired number of colors.
             if (currentBestSolution.size() <= targetColors) {
+                System.out.println("[k=" + k + "] Solution found that is ≤ target value for colors.");
                 break;
             }
             else {
@@ -133,10 +148,53 @@ public class AntColSubroutine implements Subroutine {
                 // global trail matrix value = evaporation rate * current trail value + pheremone delta value.
                 updateGlobalTrailMatrix();
                 k = currentBestSolution.size() - 1;
+
+                System.out.println("[k=" + k + "] ------------------------------------ Preparing for next iteration... ------------------------------------");
             }
         }
 
-        return null;
+        // If we have a solution, let's remap the solution appropriately.
+        // `solution` has a list of vertices per each color. Here, we
+        // simply map each node to its value for `GraphSolution`.
+        if (currentBestSolution != null) {
+            GraphSolution graphSolution = new GraphSolution();
+            Map<Integer, Integer> currentColoring = solutionMap(currentBestSolution);
+
+            graphSolution.setColoring(currentColoring);
+            graphSolution.setK(currentBestSolution.size());
+
+            solutionWithStatus.setSolution(graphSolution);
+            solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
+        }
+        else {
+            solutionWithStatus.setStatus(ColoringStatus.TIMEOUT);
+        }
+
+        return solutionWithStatus;
+    }
+
+    private Map<Integer, Integer> solutionMap(List<List<Integer>> solution) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < currentBestSolution.size(); i++) {
+            List<Integer> coloredVertices = currentBestSolution.get(i);
+            for (Integer vertex : coloredVertices) {
+                map.put(vertex, i);
+            }
+        }
+
+        return map;
+    }
+
+    private List<List<Integer>> antColSolutionValue(Map<Integer, Integer> map, Integer colors) {
+        List<List<Integer>> solutionValue = Stream.generate(ArrayList<Integer>::new)
+                .limit(colors)
+                .collect(Collectors.toList());
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            solutionValue.get(entry.getValue()).add(entry.getKey());
+        }
+
+        return solutionValue;
     }
 
     private boolean buildSolution() {
@@ -196,7 +254,6 @@ public class AntColSubroutine implements Subroutine {
 
                 // Pick a vertex at random from this independent set.
                 Integer randomIndex = random.nextInt(updatedTempYISet.size());
-                randomIndex = 0;
                 Integer vertex = updatedTempYISet.get(randomIndex) + 1;
                 independentSets.get(iset).add(vertex);
 
@@ -264,7 +321,7 @@ public class AntColSubroutine implements Subroutine {
             // At this point, we've created an appropriate number of independent coloring sets.
             // Pick the one that results in the least number of edges in the remaining uncolored vertices.
             int indexToSelect = chooseMinimumEdges(tempX);
-            List<Integer> selectedISet = independentSets.get(indexToSelect);
+            List<Integer> selectedISet = new ArrayList<>(independentSets.get(indexToSelect));
 
             // Assign these vertices to the current coloring index.
             numberColored += selectedISet.size();
@@ -386,12 +443,12 @@ public class AntColSubroutine implements Subroutine {
         // We then iterate through the list of tauEtas to see where this
         // value "lands" across the spectrum of values via bounds.
         double accumulator = 0.0;
-        double selectedValue = /*ThreadLocalRandom.current().nextDouble(1.0)*/ 0.13153778808191419 * tauEtaTotal;
-        // selectedValue = 0.13153778808191419 * tauEtaTotal; // FIXME
+        double selectedValue = ThreadLocalRandom.current().nextDouble(1.0) * tauEtaTotal;
+
         for (int i = 0; i < tauEta.size(); i++) {
             double tauEtaValue = tauEta.get(i);
             if (accumulator <= selectedValue && selectedValue < (accumulator + tauEtaValue)) {
-                System.out.println("Selecting index: " + i);
+                // System.out.println("Selecting index: " + i);
                 return i;
             }
             else {
@@ -430,12 +487,26 @@ public class AntColSubroutine implements Subroutine {
             }
         }
 
-        System.out.println("Choosing minimum edge index: " + minimumIndex);
+        // System.out.println("Choosing minimum edge index: " + minimumIndex);
         return minimumIndex;
     }
 
     private void prepare() {
         createDegreesVector();
+
+        System.out.println("---------------------------------------------");
+        System.out.println("Running AntCol with the following parameters:");
+        System.out.println("Maximum constraint checks:  " + numberOfConstraintChecks);
+        System.out.println("Target coloring value:      " + targetColors);
+        System.out.println("Random seed:                " + randomSeed);
+        System.out.println("TabuCol iterations:         " + tabuIterations);
+        System.out.println("Initial `k`:                " + k);
+        System.out.println("Alpha:                      " + alpha);
+        System.out.println("Beta:                       " + beta);
+        System.out.println("Evaporation rate:           " + evaporationRate);
+        System.out.println("Number of ants:             " + numberOfAnts);
+        System.out.println("Number of multisets:        " + numberOfMultisets);
+        System.out.println("---------------------------------------------");
     }
 
     private void createDegreesVector() {
@@ -464,7 +535,7 @@ public class AntColSubroutine implements Subroutine {
     }
 
     private void resetLocalPheremoneDelta() {
-        System.out.println("Resetting local pheremone delta matrix.")
+        System.out.println("[k=" + k + "] Resetting local pheremone delta matrix.");
         Integer numberOfVertices = graphDefinition.getGraphWrapper().getVertexSize();
         this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
     }
@@ -473,13 +544,14 @@ public class AntColSubroutine implements Subroutine {
      * Creates an empty solution list using k colors.
      */
     private void resetSolution() {
-        System.out.println("Resetting solution array.");
+        System.out.println("[k=" + k + "] Resetting solution array.");
         this.solution = Stream.generate(ArrayList<Integer>::new)
                 .limit(k)
                 .collect(Collectors.toList());
     }
 
     private void updateGlobalTrailMatrix() {
+        System.out.println("[k=" + k + "] Updating global trail matrix.");
         for (int i = 0; i < graphDefinition.getGraphWrapper().getNumberOfVertices(); i++) {
             for (int j = 0; j < graphDefinition.getGraphWrapper().getNumberOfVertices(); j++) {
                 if (i != j) {
