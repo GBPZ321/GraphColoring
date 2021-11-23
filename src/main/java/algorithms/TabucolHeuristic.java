@@ -110,9 +110,9 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
             }
             TabucolSubroutine tabucolSubroutine;
             if(Objects.isNull(statisticMatrix)) {
-                 tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k), this.shared);
+                 tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, iterations, new SimpleOrderedColoring(graphWrapper.getGraph(), k), this.shared);
             } else {
-                tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k), this.statisticMatrix, this.shared);
+                tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, iterations, new SimpleOrderedColoring(graphWrapper.getGraph(), k), this.statisticMatrix, this.shared);
             }
             SolutionWithStatus possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
