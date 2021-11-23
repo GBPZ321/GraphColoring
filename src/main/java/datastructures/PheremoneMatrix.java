@@ -2,6 +2,9 @@ package datastructures;
 
 import java.util.Arrays;
 
+/**
+ * A double-type-based matrix used for local pheremone valuation.
+ */
 public class PheremoneMatrix {
     private final double[][] matrix;
 

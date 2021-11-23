@@ -1,6 +1,6 @@
-import algorithms.genetic.SimpleGeneticSubroutine;
-import datastructures.pojo.SolutionWithStatus;
+import algorithms.AntColHeuristic;
 import graph.definition.GraphDefinition;
+import graph.solution.GraphSolution;
 import reader.DimacsReader;
 import reader.GraphReader;
 
@@ -10,14 +10,14 @@ public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        String name = "graphs/jean.col";
+        String name = "graphs/antcol.graph.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
 
         AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph);
         GraphSolution solution = antColHeuristic.getColoring();
         System.out.println(solution.getK());
         System.out.println(antColHeuristic.getName());
-        System.out.println(sat(testGraph, solution.getColoring()));
+//        System.out.println(sat(testGraph, solution.getColoring()));
 
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
