@@ -17,6 +17,7 @@ public class Matrix {
     }
 
     public void increment(int row, int column) {
+
         matrix[row][column]++;
     }
 

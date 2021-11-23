@@ -162,21 +162,9 @@ public class MetropolisExperiment {
             }
             graphTrials.add(thread);
         }
-        List<Future<GraphSolution>> solutions = executorService.invokeAll(graphTrials);
-        int minK = Integer.MAX_VALUE;
-        for (Future<GraphSolution> solutionFuture : solutions) {
-            GraphSolution solution = solutionFuture.get();
-            if(solution == null) {
-                // Thread did no useful work.
-                continue;
-            }
-            minK = Math.min(solutionFuture.get().getK(), minK);
-        }
-
-        System.out.printf("%s,", properName);
-        System.out.printf("%d,%d,%d\n", testGraph.getGraphWrapper().getNumberOfVertices(), testGraph.getGraphWrapper().getEdgeCount(), minK);
-        k.add(minK);
-        resourceAsStream.close();
-        executorService.shutdownNow();
+        int minK = ExperimentCommon.findMinSoln(executorService, graphTrials);
+        ExperimentCommon.printAndClose(k, executorService, properName, resourceAsStream, testGraph, minK);
     }
+
+
 }

@@ -1,8 +1,12 @@
 package algorithms.partialcol;
 
 import algorithms.interfaces.MovePickingStrategy;
+import algorithms.interfaces.SharableSubroutine;
 import algorithms.interfaces.Subroutine;
 import algorithms.movepicking.PartialColFeasibleMove;
+import algorithms.movepicking.StatisticMatrixMinimizationMovePartialCol;
+import datastructures.StatisticMatrix;
+import datastructures.common.Shared;
 import datastructures.pojo.SolutionWithStatus;
 import datastructures.SolutionMatrix;
 import datastructures.TabuStructure;
@@ -14,9 +18,8 @@ import graph.solution.GraphSolution;
 
 import java.util.*;
 
-public class PartialColSubroutine implements Subroutine {
+public class PartialColSubroutine extends SharableSubroutine implements Subroutine {
     private final GraphWrapper graphWrapper;
-    private final int k;
     private final int iterations;
     private final SolutionMatrix solutionMatrix;
     private final TabuStructure tabuStructure;
@@ -26,9 +29,9 @@ public class PartialColSubroutine implements Subroutine {
     private final Map<Integer, Integer> coloring;
     private final MovePickingStrategy movePickingStrategy;
 
-    public PartialColSubroutine(GraphDefinition graphDefinition, int k, float alpha, int l, int iterationTimeout) {
+    public PartialColSubroutine(GraphDefinition graphDefinition, int k, double alpha, int l, int iterationTimeout, Shared shared) {
+        super(shared, k);
         this.graphWrapper = graphDefinition.getGraphWrapper();
-        this.k = k;
         this.iterations = iterationTimeout;
         this.tabuStructure = new TabuStructure(l, alpha);
         this.previousTimesEncountered = 0;
@@ -39,6 +42,21 @@ public class PartialColSubroutine implements Subroutine {
         this.unsolved = starterKit.getU();
         this.solutionMatrix = new SolutionMatrix(coloring, k, graphWrapper);
         this.movePickingStrategy = new PartialColFeasibleMove(unsolved, k, solutionMatrix, tabuStructure);
+    }
+
+    public PartialColSubroutine(GraphDefinition graphDefinition, int k, double alpha, int l, int iterationTimeout, Shared shared, StatisticMatrix statisticMatrix) {
+        super(shared, k);
+        this.graphWrapper = graphDefinition.getGraphWrapper();
+        this.iterations = iterationTimeout;
+        this.tabuStructure = new TabuStructure(l, alpha);
+        this.previousTimesEncountered = 0;
+        this.previousSz = 0;
+        PartialColStartingColoring startingColoring = new PartialColStartingColoring(graphWrapper, k);
+        PartialColStarterKit starterKit = startingColoring.getColoring();
+        this.coloring = starterKit.getStartingColorings();
+        this.unsolved = starterKit.getU();
+        this.solutionMatrix = new SolutionMatrix(coloring, k, graphWrapper);
+        this.movePickingStrategy = new StatisticMatrixMinimizationMovePartialCol(unsolved, k, solutionMatrix, tabuStructure, statisticMatrix);
     }
 
     public SolutionWithStatus findSolution() {
@@ -55,6 +73,11 @@ public class PartialColSubroutine implements Subroutine {
                 solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
                 solutionWithStatus.setSolution(new GraphSolution(coloring, k));
                 return solutionWithStatus;
+            }
+            if(runs % 100 == 0 && lowerKFound()) {
+                System.out.println("Shortcut found");
+                solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
+                solutionWithStatus.setSolution(shared.getCurrentMinimum());
             }
             previousSz = unsolved.size();
             findBestMoveAndUpdateMatrices(coloring, unsolved);

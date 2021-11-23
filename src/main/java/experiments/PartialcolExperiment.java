@@ -1,11 +1,11 @@
 package experiments;
 
-import algorithms.TabucolHeuristic;
+import algorithms.PartialColHeuristic;
 import datastructures.StatisticMatrix;
 import datastructures.common.Shared;
 import experiments.common.AdditionalConfiguration;
-import experiments.common.ExperimentCommon;
 import experiments.common.ColorConfiguration;
+import experiments.common.ExperimentCommon;
 import graph.definition.GraphDefinition;
 import graph.solution.GraphSolution;
 import reader.DimacsReader;
@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import static algorithms.random.RandomUtils.getNRandomDoublesInRange;
 import static algorithms.random.RandomUtils.getNRandomIntsInRange;
 
-public class TabucolExperiment {
+public class PartialcolExperiment {
     private static final String header = "Graph Name, Vertices, Edges, Coloring";
     private static final GraphReader reader = new DimacsReader();
 
@@ -55,7 +55,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentOne() throws IOException {
-        String experimentLabel = "Standard tabucol algorithm for various graphs.";
+        String experimentLabel = "Standard partialcol algorithm for various graphs.";
         ExperimentCommon.printLog(experimentLabel, header);
 
 
@@ -65,7 +65,7 @@ public class TabucolExperiment {
             String properName = filename.replace(".col", "");
             InputStream resourceAsStream = ExperimentCommon.getStream(filename);
             GraphDefinition testGraph = reader.getGraph(resourceAsStream, properName);
-            TabucolHeuristic heuristic = new TabucolHeuristic(testGraph);
+            PartialColHeuristic heuristic = new PartialColHeuristic(testGraph, PartialColHeuristic.DEFAULT_ALPHA, PartialColHeuristic.DEFAULT_L);
             System.out.printf("%s,", properName);
             GraphSolution solution = heuristic.getColoring();
             k.add(solution.getK());
@@ -79,7 +79,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentTwo() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -87,7 +87,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .5, 1.1, 3, 10, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(false).withMatrix(false).build());
+            runMulithreadedExperiment(threads, k, filename, .5, 1.1, 3, 10, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(false).withMatrix(false).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -95,7 +95,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentThree() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -103,7 +103,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .5, 1.1,3,10, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(false).build());
+            runMulithreadedExperiment(threads, k, filename, .5, 1.1,3,10, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(true).withMatrix(false).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -111,7 +111,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentFour() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -119,7 +119,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .7, 1,5,9, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(false).build());
+            runMulithreadedExperiment(threads, k, filename, .7, 1,5,9, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(true).withMatrix(false).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -127,7 +127,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentFive() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -135,7 +135,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .7, 1,5,9, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(true).build());
+            runMulithreadedExperiment(threads, k, filename, .7, 1,5,9, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(true).withMatrix(true).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -143,7 +143,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentSix() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -151,7 +151,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .8, .9,3,12, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(true).build());
+            runMulithreadedExperiment(threads, k, filename, .8, .9,3,12, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(true).withMatrix(true).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -159,7 +159,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentSeven() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -167,7 +167,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .9, .9,8,8, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(true).build());
+            runMulithreadedExperiment(threads, k, filename, .9, .9,8,8, ColorConfiguration.builder().configuration(AdditionalConfiguration.PARTIALCOL).cooperative(true).withMatrix(true).build());
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -181,7 +181,7 @@ public class TabucolExperiment {
         GraphDefinition testGraph = reader.getGraph(resourceAsStream, properName);
         Shared shared = new Shared(testGraph.getGraphWrapper().getNumberOfVertices(), threads);
         StatisticMatrix matrix = new StatisticMatrix(testGraph.getGraphWrapper().getNumberOfVertices());
-        List<TabucolThread> graphTrials = new ArrayList<>();
+        List<PartialcolThread> graphTrials = new ArrayList<>();
         List<Double> alpha;
         if(alphaHigher != alphaLower) {
             alpha = getNRandomDoublesInRange(alphaLower, alphaHigher, threads);
@@ -191,19 +191,19 @@ public class TabucolExperiment {
 
         List<Integer> Ls;
         if(lHigher != lLower) {
-             Ls = getNRandomIntsInRange(lLower, lHigher, threads);
+            Ls = getNRandomIntsInRange(lLower, lHigher, threads);
         } else {
             Ls = Collections.nCopies(threads, lHigher);
         }
         int threadCnt = 1;
         for (int i = 0; i < alpha.size(); ++i) {
-            TabucolThread thread;
+            PartialcolThread thread;
             if(configuration.isCooperative() && configuration.isWithMatrix()) {
-                thread = new TabucolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++, shared, matrix);
+                thread = new PartialcolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++, shared, matrix);
             } else if(configuration.isCooperative()) {
-                thread = new TabucolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++, shared);
+                thread = new PartialcolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++, shared);
             } else {
-                thread = new TabucolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++);
+                thread = new PartialcolThread(testGraph, Ls.get(i), alpha.get(i), threadCnt++);
             }
             graphTrials.add(thread);
         }
@@ -211,6 +211,4 @@ public class TabucolExperiment {
         int minK = ExperimentCommon.findMinSoln(executorService,graphTrials);
         ExperimentCommon.printAndClose(k, executorService, properName, resourceAsStream, testGraph, minK);
     }
-
-
 }
