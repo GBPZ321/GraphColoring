@@ -355,9 +355,11 @@ public class AntColSubroutine implements Subroutine {
             // The solution is incomplete. Randomly assign uncolored nodes and return.
             for (i = 0; i < graphDefinition.getGraphWrapper().getNumberOfVertices(); i++) {
                 if (X.get(i) >= 0) {
-                    solution.get(random.nextInt(solution.size())).add(i);
+                    int randomColor = random.nextInt(solution.size());
+                    solution.get(randomColor).add(i + 1);
                 }
             }
+
             return false;
         }
         else {
