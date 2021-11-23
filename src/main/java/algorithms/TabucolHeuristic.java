@@ -18,17 +18,31 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
     private final GraphDefinition graphDefinition;
     private static final Double DEFAULT_ALPHA = .6;
     private static final Integer DEFAULT_L = 8;
+    private int k;
     private final int L;
     private final double alpha;
+    private final int iterations;
 
     public TabucolHeuristic(GraphDefinition g) {
         this.graphDefinition = g;
+        this.k = g.getGraphWrapper().getVertexSize();
         this.alpha = DEFAULT_ALPHA;
         this.L = DEFAULT_L;
+        this.iterations = DEFAULT_ITERATIONS;
     }
 
     public TabucolHeuristic(GraphDefinition g, int iter, double a, int l) {
         graphDefinition = g;
+        k = g.getGraphWrapper().getVertexSize();
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l) {
+        graphDefinition = g;
+        this.k = k;
+        iterations = iter;
         alpha = a;
         L = l;
     }
@@ -36,6 +50,17 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
     public TabucolHeuristic(GraphDefinition g, int iter, double a, int l, Shared shared) {
         super(shared);
         graphDefinition = g;
+        k = g.getGraphWrapper().getVertexSize();
+        iterations = iter;
+        alpha = a;
+        L = l;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l, Shared shared) {
+        super(shared);
+        graphDefinition = g;
+        this.k = k;
+        iterations = iter;
         alpha = a;
         L = l;
     }
@@ -44,7 +69,6 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
     public GraphSolution getColoring() {
         GraphSolution solution = null;
         GraphWrapper graphWrapper = graphDefinition.getGraphWrapper();
-        int k = graphWrapper.getVertexSize();
         while(k > 1) {
             System.out.println("K = " + k);
             if(isGlobalKLower(k)) {
@@ -52,7 +76,7 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
                 k--;
                 continue;
             }
-            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, DEFAULT_ITERATIONS, new SimpleOrderedColoring(graphWrapper.getGraph(), k));
+            TabucolSubroutine tabucolSubroutine = new TabucolSubroutine(graphDefinition, k, alpha, L, iterations, new SimpleOrderedColoring(graphWrapper.getGraph(), k));
             SolutionWithStatus possibleSolution = tabucolSubroutine.findSolution();
             if(possibleSolution.getStatus() == ColoringStatus.SATISFIED) {
                 solution = possibleSolution.getSolution();
