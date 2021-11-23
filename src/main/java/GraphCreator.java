@@ -10,14 +10,13 @@ public class GraphCreator {
 
     public static void main(String[] args) throws IOException {
         GraphReader reader = new DimacsReader();
-        String name = "graphs/antcol.graph.col";
+        String name = "graphs/dsjc125.1.col";
         GraphDefinition testGraph = reader.getGraph(GraphCreator.class.getClassLoader().getResourceAsStream(name), name);
 
-        AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph);
+        AntColHeuristic antColHeuristic = new AntColHeuristic(testGraph, false);
         GraphSolution solution = antColHeuristic.getColoring();
         System.out.println(solution.getK());
         System.out.println(antColHeuristic.getName());
-//        System.out.println(sat(testGraph, solution.getColoring()));
 
 //        List<ColoringHeuristic> heuristics = Arrays.asList(new PartialColHeuristic(testGraph), new HCDHeuristic(testGraph.getGraphWrapper()), new TabucolHeuristic(testGraph));
 //        List<ColoringHeuristic> heuristics = Collections.singletonList(new MetropolisHeuristic(testGraph));
