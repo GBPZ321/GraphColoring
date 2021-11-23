@@ -30,6 +30,7 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
         this.k = g.getGraphWrapper().getVertexSize();
         this.alpha = DEFAULT_ALPHA;
         this.L = DEFAULT_L;
+        this.iterations = DEFAULT_ITERATIONS;
         this.statisticMatrix = null;
     }
 
@@ -52,13 +53,7 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
         this.statisticMatrix = statisticMatrix;
     }
 
-    public TabucolHeuristic(GraphDefinition g) {
-        this.graphDefinition = g;
-        this.k = g.getGraphWrapper().getVertexSize();
-        this.alpha = DEFAULT_ALPHA;
-        this.L = DEFAULT_L;
-        this.iterations = DEFAULT_ITERATIONS;
-    }
+
 
     public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l, Shared shared) {
         super(shared);
@@ -67,22 +62,7 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
         iterations = iter;
         alpha = a;
         L = l;
-    }
-
-    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l) {
-        graphDefinition = g;
-        k = g.getGraphWrapper().getVertexSize();
-        iterations = iter;
-        alpha = a;
-        L = l;
-    }
-
-    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l) {
-        graphDefinition = g;
-        this.k = k;
-        iterations = iter;
-        alpha = a;
-        L = l;
+        this.statisticMatrix = null;
     }
 
     public TabucolHeuristic(GraphDefinition g, int iter, double a, int l, Shared shared) {
@@ -92,16 +72,30 @@ public class TabucolHeuristic extends BaseCooperative implements ColoringHeurist
         iterations = iter;
         alpha = a;
         L = l;
+        this.statisticMatrix = null;
     }
 
-    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l, Shared shared) {
-        super(shared);
+    public TabucolHeuristic(GraphDefinition g, int iter, double a, int l) {
+        graphDefinition = g;
+        k = g.getGraphWrapper().getVertexSize();
+        iterations = iter;
+        alpha = a;
+        L = l;
+        this.statisticMatrix = null;
+    }
+
+    public TabucolHeuristic(GraphDefinition g, int k, int iter, double a, int l) {
         graphDefinition = g;
         this.k = k;
         iterations = iter;
         alpha = a;
         L = l;
+        this.statisticMatrix = null;
     }
+
+
+
+
 
     @Override
     public GraphSolution getColoring() {
