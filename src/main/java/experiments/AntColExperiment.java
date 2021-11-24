@@ -2,8 +2,6 @@ package experiments;
 
 import algorithms.AntColHeuristic;
 import datastructures.common.Shared;
-import experiments.common.AdditionalConfiguration;
-import experiments.common.ColorConfiguration;
 import experiments.common.ExperimentCommon;
 import graph.definition.GraphDefinition;
 import graph.solution.GraphSolution;

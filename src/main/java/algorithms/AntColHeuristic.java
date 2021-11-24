@@ -7,7 +7,7 @@ import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
 import graph.solution.GraphSolution;
 
-public class AntColHeuristic extends BaseCooperative implements ColoringHeuristic {
+public class AntColHeuristic implements ColoringHeuristic {
 
     private final GraphDefinition graphDefinition;
     private final static Integer DEFAULT_CONSTRAINT_CHECKS = 100000000;

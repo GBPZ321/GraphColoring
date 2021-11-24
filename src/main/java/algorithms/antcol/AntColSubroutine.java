@@ -146,7 +146,7 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
             }
 
             // We have found a solution that is less than or equal to the desired number of colors.
-            if (currentBestSolution.size() <= targetColors || lowerKFound()) {
+            if (currentBestSolution.size() <= targetColors) {
                 printDebug("[k=" + k + "] Solution found that is ≤ target value for colors.");
                 break;
             }
@@ -154,7 +154,13 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
                 // Otherwise, update the global trail matrix and continue.
                 // global trail matrix value = evaporation rate * current trail value + pheremone delta value.
                 updateGlobalTrailMatrix();
-                k = currentBestSolution.size() - 1;
+                // In cooperative mode, we can try to skip any k's that are irrelevant.
+                if (lowerKFound()) {
+                    k = shared.getCurrentMinimum().getK() - 1;
+                }
+                else {
+                    k = currentBestSolution.size() - 1;
+                }
 
                 printDebug("[k=" + k + "] ------------------------------------ Preparing for next iteration... ------------------------------------");
             }
@@ -179,6 +185,8 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
 
             solutionWithStatus.setSolution(graphSolution);
             solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
+
+            shared.updateSolution(graphSolution);
         }
         else {
             solutionWithStatus.setStatus(ColoringStatus.TIMEOUT);
@@ -187,6 +195,12 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
         return solutionWithStatus;
     }
 
+    private void updateSolution(GraphSolution solution) {
+        if(!Objects.isNull(shared)) {
+            shared.updateSolution(solution);
+        }
+    }
+    
     private Map<Integer, Integer> solutionMap(List<List<Integer>> solution) {
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < currentBestSolution.size(); i++) {
