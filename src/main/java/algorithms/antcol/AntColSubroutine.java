@@ -1,8 +1,10 @@
 package algorithms.antcol;
 
 import algorithms.TabucolHeuristic;
+import algorithms.interfaces.SharableSubroutine;
 import algorithms.interfaces.Subroutine;
 import datastructures.PheremoneMatrix;
+import datastructures.common.Shared;
 import datastructures.pojo.ColoringStatus;
 import datastructures.pojo.SolutionWithStatus;
 import graph.definition.GraphDefinition;
@@ -14,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AntColSubroutine implements Subroutine {
+public class AntColSubroutine extends SharableSubroutine implements Subroutine {
 
     /**
      * The graph.
@@ -47,7 +49,7 @@ public class AntColSubroutine implements Subroutine {
 
     private final Double alpha = 2.0;
     private final Double beta = 3.0;
-    private final Double evaporationRate = 0.75;
+    private Double evaporationRate = 0.75;
     private Double solutionCost;
     private final Integer numberOfAnts = 10;
     private final Integer numberOfMultisets = 5;
@@ -62,7 +64,8 @@ public class AntColSubroutine implements Subroutine {
 
     private final boolean verbose;
 
-    public AntColSubroutine(GraphDefinition graphDefinition, Integer k, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors, boolean verbose) {
+    public AntColSubroutine(GraphDefinition graphDefinition, Integer k, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors, Double evaporationRate, boolean verbose, Shared shared) {
+        super(shared, k);
         Integer numberOfVertices = graphDefinition.getGraphWrapper().getVertexSize();
         this.graphDefinition = graphDefinition;
         this.k = k;
@@ -70,6 +73,7 @@ public class AntColSubroutine implements Subroutine {
         this.tabuIterations = tabuIterations * numberOfVertices;
         this.randomSeed = randomSeed;
         this.targetColors = targetColors;
+        this.evaporationRate = evaporationRate;
         this.degrees = new ArrayList<>();
         this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
         this.globalTrailMatrix = new PheremoneMatrix(numberOfVertices, numberOfVertices);
@@ -142,7 +146,7 @@ public class AntColSubroutine implements Subroutine {
             }
 
             // We have found a solution that is less than or equal to the desired number of colors.
-            if (currentBestSolution.size() <= targetColors) {
+            if (currentBestSolution.size() <= targetColors || lowerKFound()) {
                 printDebug("[k=" + k + "] Solution found that is ≤ target value for colors.");
                 break;
             }
@@ -156,10 +160,17 @@ public class AntColSubroutine implements Subroutine {
             }
         }
 
-        // If we have a solution, let's remap the solution appropriately.
-        // `solution` has a list of vertices per each color. Here, we
-        // simply map each node to its value for `GraphSolution`.
-        if (currentBestSolution != null) {
+        // In cooperative mode, we can check to see if we have already found
+        // a lower k.
+        if (lowerKFound()) {
+            printDebug("Found a better solution elsewhere.");
+            solutionWithStatus.setSolution(shared.getCurrentMinimum());
+            solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
+        }
+        else if (currentBestSolution != null) {
+            // If we have a solution, let's remap the solution appropriately.
+            // `solution` has a list of vertices per each color. Here, we
+            // simply map each node to its value for `GraphSolution`.
             GraphSolution graphSolution = new GraphSolution();
             Map<Integer, Integer> currentColoring = solutionMap(currentBestSolution);
 
