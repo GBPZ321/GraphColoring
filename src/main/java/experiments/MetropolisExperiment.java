@@ -94,7 +94,7 @@ public class MetropolisExperiment {
     }
 
     private static void experimentThree() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Tighter bound metropolis [4] algorithm for various graphs.";
+        String experimentLabel = "Tighter bound metropolis [4] algorithm for various graphs with cooperation.";
         System.out.println(experimentLabel);
         System.out.println(header);
 
@@ -111,7 +111,7 @@ public class MetropolisExperiment {
     }
 
     private static void experimentFour() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Tighter bound metropolis [5] algorithm for various graphs.";
+        String experimentLabel = "Even tighter bound metropolis [5] algorithm for various graphs with cooperation.";
         System.out.println(experimentLabel);
         System.out.println(header);
 
@@ -128,7 +128,7 @@ public class MetropolisExperiment {
     }
 
     private static void experimentFive() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Tighter bound metropolis [4] algorithm for various graphs.";
+        String experimentLabel = "Looser bound metropolis [4] algorithm for various graphs with cooperation.";
         System.out.println(experimentLabel);
         System.out.println(header);
 

@@ -111,7 +111,7 @@ public class PartialcolExperiment {
     }
 
     private static void experimentFour() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative - shifted alpha and L.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -143,7 +143,7 @@ public class PartialcolExperiment {
     }
 
     private static void experimentSix() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix - shifted.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -159,7 +159,7 @@ public class PartialcolExperiment {
     }
 
     private static void experimentSeven() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] partialcol algorithm for various graphs cooperative w/matrix - very tight bound.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;

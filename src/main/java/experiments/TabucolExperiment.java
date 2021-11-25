@@ -111,7 +111,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentFour() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative.";
+        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative - tighter alpha, tighter L.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -143,7 +143,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentSix() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix - tighter alpha.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -159,7 +159,7 @@ public class TabucolExperiment {
     }
 
     private static void experimentSeven() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix.";
+        String experimentLabel = "Mulithreaded [8] tabucol algorithm for various graphs cooperative w/matrix - no tolerance.";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
