@@ -133,6 +133,8 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
                         currentBestSolution = solution;
                     }
 
+                    updateCurrentBestSolution();
+
                     // Because we have found a feasible solution |solution| using k (or fewer) colors,
                     // we can leave this `nants` cycle and set k = |solution| - 1.
                     break;
@@ -177,16 +179,9 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
             // If we have a solution, let's remap the solution appropriately.
             // `solution` has a list of vertices per each color. Here, we
             // simply map each node to its value for `GraphSolution`.
-            GraphSolution graphSolution = new GraphSolution();
-            Map<Integer, Integer> currentColoring = solutionMap(currentBestSolution);
-
-            graphSolution.setColoring(currentColoring);
-            graphSolution.setK(currentBestSolution.size());
-
+            GraphSolution graphSolution = updateCurrentBestSolution();
             solutionWithStatus.setSolution(graphSolution);
             solutionWithStatus.setStatus(ColoringStatus.SATISFIED);
-
-            shared.updateSolution(graphSolution);
         }
         else {
             solutionWithStatus.setStatus(ColoringStatus.TIMEOUT);
@@ -211,6 +206,18 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
         }
 
         return map;
+    }
+
+    private GraphSolution updateCurrentBestSolution() {
+        GraphSolution graphSolution = new GraphSolution();
+        Map<Integer, Integer> currentColoring = solutionMap(currentBestSolution);
+
+        graphSolution.setColoring(currentColoring);
+        graphSolution.setK(currentBestSolution.size());
+
+        updateSolution(graphSolution);
+
+        return graphSolution;
     }
 
     private List<List<Integer>> antColSolutionValue(Map<Integer, Integer> map, Integer colors) {
