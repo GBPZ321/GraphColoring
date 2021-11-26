@@ -47,6 +47,9 @@ public class MetropolisExperiment {
             case "5":
                 experimentFive();
                 break;
+            case "6":
+                experimentSix();
+                break;
         }
         System.exit(0);
     }
@@ -138,6 +141,23 @@ public class MetropolisExperiment {
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
             runMulithreadedExperiment(threads, k, filename, .95, 1, true);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentSix() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Much looser bound metropolis [4] algorithm for various graphs with cooperation.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .5, 1.5, true);
         }
         for(int kz : k) {
             System.out.println(kz);

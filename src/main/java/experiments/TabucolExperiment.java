@@ -151,7 +151,7 @@ public class TabucolExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .8, .9,3,12, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(true).build());
+            runMulithreadedExperiment(threads, k, filename, .85, .95,3,12, ColorConfiguration.builder().configuration(AdditionalConfiguration.TABUCOL).cooperative(true).withMatrix(true).build());
         }
         for(int kz : k) {
             System.out.println(kz);
