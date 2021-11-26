@@ -49,9 +49,9 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
 
     private final Double alpha = 2.0;
     private final Double beta = 3.0;
-    private Double evaporationRate = 0.75;
+    private Double evaporationRate;
     private Double solutionCost;
-    private final Integer numberOfAnts = 10;
+    private final Integer numberOfAnts;
     private final Integer numberOfMultisets = 5;
 
     private Integer k;
@@ -64,7 +64,16 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
 
     private final boolean verbose;
 
-    public AntColSubroutine(GraphDefinition graphDefinition, Integer k, Integer constraintChecks, Integer tabuIterations, Integer randomSeed, Integer targetColors, Double evaporationRate, boolean verbose, Shared shared) {
+    public AntColSubroutine(GraphDefinition graphDefinition,
+                            Integer k,
+                            Integer constraintChecks,
+                            Integer tabuIterations,
+                            Integer randomSeed,
+                            Integer targetColors,
+                            Double evaporationRate,
+                            Integer numberOfAnts,
+                            boolean verbose,
+                            Shared shared) {
         super(shared, k);
         Integer numberOfVertices = graphDefinition.getGraphWrapper().getVertexSize();
         this.graphDefinition = graphDefinition;
@@ -74,6 +83,7 @@ public class AntColSubroutine extends SharableSubroutine implements Subroutine {
         this.randomSeed = randomSeed;
         this.targetColors = targetColors;
         this.evaporationRate = evaporationRate;
+        this.numberOfAnts = numberOfAnts;
         this.degrees = new ArrayList<>();
         this.localPheremoneDelta = new PheremoneMatrix(numberOfVertices, numberOfVertices);
         this.globalTrailMatrix = new PheremoneMatrix(numberOfVertices, numberOfVertices);

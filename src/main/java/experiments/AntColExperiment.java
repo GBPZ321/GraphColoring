@@ -40,6 +40,12 @@ public class AntColExperiment {
             case "5":
                 experimentFive();
                 break;
+            case "6":
+                experimentSix();
+                break;
+            case "7":
+                experimentSeven();
+                break;
         }
         System.exit(0);
     }
@@ -77,7 +83,7 @@ public class AntColExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for (String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .6, 1.2, false);
+            runMulithreadedExperiment(threads, k, filename, .60, 1.20, 10,false);
         }
         for (int kz : k) {
             System.out.println(kz);
@@ -93,7 +99,7 @@ public class AntColExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .6, 1.2, true);
+            runMulithreadedExperiment(threads, k, filename, .60, 1.20, 10,true);
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -101,7 +107,7 @@ public class AntColExperiment {
     }
 
     private static void experimentFour() throws IOException, InterruptedException, ExecutionException {
-        String experimentLabel = "Mulithreaded [8] antcol algorithm for various graphs (evap rate: 0.25 ≤ x ≤ 0.75).";
+        String experimentLabel = "Mulithreaded [8] antcol algorithm for various graphs (evap rate: 0.15 ≤ x ≤ 0.6).";
         ExperimentCommon.printLog(experimentLabel, header);
 
         int threads = 8;
@@ -109,7 +115,7 @@ public class AntColExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for (String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .25, .75, false);
+            runMulithreadedExperiment(threads, k, filename, .15, .60, 10, false);
         }
         for (int kz : k) {
             System.out.println(kz);
@@ -125,14 +131,46 @@ public class AntColExperiment {
         List<String> files = ExperimentCommon.getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .25, .75, true);
+            runMulithreadedExperiment(threads, k, filename, .25, .75, 10,true);
         }
         for(int kz : k) {
             System.out.println(kz);
         }
     }
 
-    private static void runMulithreadedExperiment(int threads, List<Integer> k, String filename, double evapRateLower, double evapRateHigher, boolean cooperative) throws IOException, InterruptedException, ExecutionException {
+    private static void experimentSix() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Mulithreaded [8] antcol algorithm for various graphs (evap rate: 0.75, nants: 20).";
+        ExperimentCommon.printLog(experimentLabel, header);
+
+        int threads = 8;
+
+        List<String> files = ExperimentCommon.getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .75, .75, 20,false);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentSeven() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Mulithreaded [8] antcol algorithm for various graphs cooperative (evap rate: 0.75, nants: 5).";
+        ExperimentCommon.printLog(experimentLabel, header);
+
+        int threads = 8;
+
+        List<String> files = ExperimentCommon.getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .75, .75, 20,true);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void runMulithreadedExperiment(int threads, List<Integer> k, String filename, double evapRateLower, double evapRateHigher, int numberOfAnts, boolean cooperative) throws IOException, InterruptedException, ExecutionException {
         ExecutorService executorService = Executors.newFixedThreadPool(threads);
         String properName = filename.replace(".col", "");
         InputStream resourceAsStream = ExperimentCommon.getStream(filename);
@@ -150,9 +188,9 @@ public class AntColExperiment {
         for (int i = 0; i < evaporationRates.size(); ++i) {
             AntColThread thread;
             if (cooperative) {
-                thread = new AntColThread(testGraph, threadCnt++, evaporationRates.get(i), shared);
+                thread = new AntColThread(testGraph, threadCnt++, evaporationRates.get(i), numberOfAnts, shared);
             } else {
-                thread = new AntColThread(testGraph, threadCnt++, evaporationRates.get(i));
+                thread = new AntColThread(testGraph, threadCnt++, evaporationRates.get(i), numberOfAnts);
             }
             graphTrials.add(thread);
         }
