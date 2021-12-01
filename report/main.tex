@@ -28,10 +28,11 @@ Javier Valenzuela
 
 \authorrunning{Perez and Valenzuela and Roberts}
 
-\institute{ Department of Electrical and Computer  Engineering\\
+\institute{ Department of Electrical and Computer Engineering\\
 University of Texas at Austin,\\
 Austin, TX 78712\\
-\email{\{gabriel_ohseas_perez, email2\}@utexas.edu}}
+ \email{\{gabriel\_ohseas\_perez, 
+ croberts22, javier.valenzuela\}@utexas.edu}}
 
 \begin{document}
 
@@ -113,7 +114,7 @@ The final experiment performed was assessing Antcol and its hyperparameters: not
 In this report we examined several different cooperative approaches to various local search algorithms. In addition, we leveraged the novel approach of Li and extended it to the PartialCol algorithm. For the evaluated graphs, no noticeable advantages were identified, and distinct disadvantages in terms of average error were observed instead. For all the algorithms, however, we did see benefit in the portfolio approach. Several other approaches were evaluated (a simple evolutionary algorithm), but we found that they were not performant enough to be viable).
 
 
-\section{Appendix}
+\section{Appendix A}
 
 The graphs used are shown below. Optimal is Approximate denotes whether we know a lower bound for said graph.
 
@@ -176,6 +177,23 @@ Note that multithreaded experiments were run with 8 threads. The notation $a[x,y
   \caption{AntCol Results}
   \label{fig:antcol}
 \end{figure}
+
+\newpage
+\section{Appendix B}
+While eviewing literature for the experiments presented in this paper, it was observed that certain authors would use different initial values for their coloring. As a side experiment, a brief comparison was made between a few of the initialization options presented. The initialization schemes compared were denominated simple-ordered, random, and unassigned-neighbor strategies.
+The simple-ordered strategy is the general case of the initialization presented in the Central Algorithm section. Vertex are assigned a coloring in an orderly fashion from 1 to $k$, and colors are cycled over until all vertex have a color. The random strategy is self-explanatory, each vertex gets assigned a color from 1 to $k$ randomly with a uniform distribution. The last strategy, unassigned-neighbor, tries to exploit lightly connected graphs, by initializing all vertices to an $uncolored$ state.
+The strategy first assigns a root vertex to color 1 and then traverses the graph, coloring each uncolored vertex found with color 1 should it not share an edge with a vertex of that color. Once the traversal is completed, a vertex from the uncolored vertex set is colored with color 2, and a new traversal begins, comparing neighbors to new color as the metric for coloring vertices. This process is repeated for all $k$ colors. The scenario that some vertices are left uncolored after the strategy is completed is high, particularly on heavily connected graphs, and the remaining uncolored vertices will be assigned randomly.\\
+
+For the comparison experiment, it was decided to use the Metropolis algorithm due to the simplicity of the implementation of the benchmark for a proof-of-concept test.
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{AntCol.png}
+  \caption{AntCol Results}
+  \label{fig:antcol}
+\end{figure}
+
 
 
 \clearpage
