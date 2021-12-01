@@ -1,6 +1,7 @@
 package experiments;
 
 import algorithms.MetropolisHeuristic;
+import algorithms.enums.MetropolisSeedingStrategy;
 import datastructures.common.Shared;
 import experiments.common.ExperimentCommon;
 import graph.definition.GraphDefinition;
@@ -89,7 +90,7 @@ public class MetropolisExperiment {
         List<String> files = getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .95, 1, false);
+            runMulithreadedExperiment(threads, k, filename, .95, 1, false, MetropolisSeedingStrategy.SIMPLE_ORDERED);
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -106,7 +107,7 @@ public class MetropolisExperiment {
         List<String> files = getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .97, .99, true);
+            runMulithreadedExperiment(threads, k, filename, .97, .99, true, MetropolisSeedingStrategy.SIMPLE_ORDERED);
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -123,7 +124,7 @@ public class MetropolisExperiment {
         List<String> files = getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .98, .99, true);
+            runMulithreadedExperiment(threads, k, filename, .98, .99, true, MetropolisSeedingStrategy.SIMPLE_ORDERED);
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -140,7 +141,7 @@ public class MetropolisExperiment {
         List<String> files = getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .95, 1, true);
+            runMulithreadedExperiment(threads, k, filename, .95, 1, true, MetropolisSeedingStrategy.SIMPLE_ORDERED);
         }
         for(int kz : k) {
             System.out.println(kz);
@@ -157,14 +158,14 @@ public class MetropolisExperiment {
         List<String> files = getListOfGraphs();
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
-            runMulithreadedExperiment(threads, k, filename, .5, 1.5, true);
+            runMulithreadedExperiment(threads, k, filename, .5, 1.5, true, MetropolisSeedingStrategy.SIMPLE_ORDERED);
         }
         for(int kz : k) {
             System.out.println(kz);
         }
     }
 
-    private static void runMulithreadedExperiment(int threads, List<Integer> k, String filename, double betaLower, double betaHigher, boolean cooperative) throws IOException, InterruptedException, ExecutionException {
+    private static void runMulithreadedExperiment(int threads, List<Integer> k, String filename, double betaLower, double betaHigher, boolean cooperative, MetropolisSeedingStrategy seedingStrategy) throws IOException, InterruptedException, ExecutionException {
         ExecutorService executorService = Executors.newFixedThreadPool(threads);
         String properName = filename.replace(".col", "");
         InputStream resourceAsStream = MetropolisExperiment.class.getClassLoader().getResourceAsStream(graphsDir + filename);
@@ -176,9 +177,9 @@ public class MetropolisExperiment {
         for (Double beta : parameters) {
             MetropolisThread thread;
             if(cooperative) {
-                thread = new MetropolisThread(testGraph, ITERATIONS, beta, threadCnt++, shared);
+                thread = new MetropolisThread(testGraph, ITERATIONS, beta, threadCnt++, seedingStrategy, shared);
             } else {
-                thread = new MetropolisThread(testGraph, ITERATIONS, beta, threadCnt++);
+                thread = new MetropolisThread(testGraph, ITERATIONS, beta, threadCnt++, seedingStrategy);
             }
             graphTrials.add(thread);
         }
