@@ -1,8 +1,12 @@
 package algorithms;
 
+import algorithms.enums.MetropolisSeedingStrategy;
 import algorithms.interfaces.ColoringHeuristic;
+import algorithms.interfaces.SeedingStrategy;
 import algorithms.metropolis.MetropolisSubroutine;
+import algorithms.random.CompletelyRandomColoring;
 import algorithms.random.SimpleOrderedColoring;
+import algorithms.random.UnassignedNeighborColoring;
 import datastructures.common.Shared;
 import datastructures.pojo.ColoringStatus;
 import datastructures.pojo.SolutionWithStatus;
@@ -33,6 +37,10 @@ public class MetropolisHeuristic extends BaseCooperative implements ColoringHeur
 
     @Override
     public GraphSolution getColoring() {
+        return getColoring(MetropolisSeedingStrategy.SIMPLE_ORDERED);
+    }
+
+    public GraphSolution getColoring(MetropolisSeedingStrategy seedingStrategy) {
         int k = wrapper.getVertexSize();
         GraphSolution coloring = null;
         while(k > 1) {
@@ -42,7 +50,22 @@ public class MetropolisHeuristic extends BaseCooperative implements ColoringHeur
                 k--;
                 continue;
             }
-            MetropolisSubroutine subroutine = new MetropolisSubroutine(wrapper, iterations, new SimpleOrderedColoring(wrapper.getGraph(), k),  k, beta);
+            SeedingStrategy ss;
+            switch(seedingStrategy){
+                case SIMPLE_ORDERED:
+                    ss = new SimpleOrderedColoring(wrapper.getGraph(), k);
+                    break;
+                case UNCOLORED_NEIGHBOR:
+                    ss = new UnassignedNeighborColoring(wrapper.getGraph(), k);
+                    break;
+                case RANDOM:
+                    ss = new CompletelyRandomColoring(wrapper, k);
+                    break;
+                default:
+                    continue;
+            }
+
+            MetropolisSubroutine subroutine = new MetropolisSubroutine(wrapper, iterations, ss,  k, beta);
 
             SolutionWithStatus solutionWithStatus = subroutine.findSolution();
             if(solutionWithStatus.getStatus() == ColoringStatus.SATISFIED) {
