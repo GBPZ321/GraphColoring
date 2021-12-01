@@ -28,10 +28,10 @@ Javier Valenzuela
 
 \authorrunning{Perez and Valenzuela and Roberts}
 
-\institute{ Department of Electrical and Computer  Engineering\\
+\institute{ Department of Electrical and Computer Engineering\\
 University of Texas at Austin,\\
 Austin, TX 78712\\
-\email{\{gabriel_ohseas_perez, email2\}@utexas.edu}}
+ \email{\{gabriel\_ohseas\_perez, croberts22, javier.valenzuela\}@utexas.edu}}
 
 \begin{document}
 
@@ -43,7 +43,8 @@ Austin, TX 78712\\
 \doublespacing
 
 \begin{abstract}
-  The \GCP is an NP-Complete problem with a rich history of approximation algorithms and heuristics. In this paper, we explore a modification to cooperative local search approaches for the graph coloring problem.
+  The \GCP is an NP-Complete problem with a rich history of approximation algorithms and heuristics.
+  In this paper, we explore a modification to cooperative local search approaches for the graph coloring problem.
 \end{abstract}
 
 \section{Introduction}
@@ -59,10 +60,11 @@ A graph, $G$, is defined as $G = (V, E)$ a set of $n$ vertices $V$ and $m$ edges
 
 \subsection{Central Algorithm}
 
-The central algorithm at the heart of these heuristics is to start at $|V|$ colorings, see if a feasible one exists, and then proceed downward. This approach was used for all of the algorithms discussed here. Another key idea used here is the \emph{portfolio} approach, in which algorithms are seeded with a combination of hyper-parameters across the different threads and consequently reduce the current coloring size faster.
+The central algorithm at the heart of these heuristics is to start at $|V|$ colorings, see if a feasible one exists, and then proceed downward.
+This approach was used for all of the algorithms discussed in this paper. Appendix B describes additional starting coloring schemes considered for the algorithms, but ultimately not used.. Another key idea put into practice is the \emph{portfolio} approach, in which algorithms are seeded with a combination of hyper-parameters across the different threads and consequently reduce the current coloring size faster.
 
 \subsection{Sharing Information}
-Throughout this paper, there are references to the term sharing information. It is important to discuss what that precisely means. In this context it is feasible for algorithms to share what the lowest $k$ determined so far is. In addition, it is also feasible for them to share information about what moves they have made. This was the statistic matrix idea suggested by Li. \cite{https://doi.org/10.5445/ir/1000083192} It was implemented for PartialCol algorithm and Tabucol algorithm. It was not performed for the Metropolis algorithm.
+Throughout this paper, there are references to the term sharing information. It is important to discuss what that precisely means. In this context, it represents the ability for algorithm threads to share what the lowest $k$ determined so far is. In addition, they are capable of sharing information about what moves they have made. This idea takes the form of a statistic matrix, as suggested by Li \cite{https://doi.org/10.5445/ir/1000083192}. It was implemented for PartialCol algorithm and Tabucol algorithm. It was not performed for the Metropolis algorithm. AntCol implements its own information sharing scheme via the pheromone trails.
 
 \section{Existing Graph Coloring Problem Approaches }
 
@@ -72,7 +74,7 @@ In this section of the paper, we will reference some existing techniques and heu
 Tabucol is an algorithm proposed by Hertz and de Werra \cite{hdw}. The implementation here is the modified version by Galinier and Hao \cite{TabuCol} and discussed in the \emph{Guide to Graph Coloring} textbook \cite{10.5555/2851123}. The algorithm fundamentally revolves around moves, i.e., shifting a coloring to a neighboring coloring by only \emph{moving} the vertex causing the most conflicts to another color class. The algorithm attempts to prevent cyclic issues by making certain moves \emph{taboo}, hence the name. The rate at which moves become accessible again is dependent upon algorithm parameters. Another algorithm that was used in this paper is called PartialCol. PartialCol itself is very similar to the tabu approaches, but organizes vertices that cannot be colored without conflict.
 
 \subsection{Metropolis Algorithm}
-The metropolis algorithm is a very simple algorithm in which we select vertices, color them, analyze their impact using a cost (or potential) function $H$ (how many neighbors are similarly colored), and approve or reject the color transitioning move with a probability based on the cost of the move. This algorithm also comes with hyper-parameters that are adjustable.
+The metropolis algorithm simple algorithm in which we select vertices at random, recolor them, analyze the impact of the coloring change using a cost (or potential) function $H$, which denotes how many forbidden edges exist with the current coloring. Color transitioning moves are approved or rejected the with a probability based on the cost of the move. This algorithm utilizes a temperature coefficient utilize to adapt the likelihood of bad moves to be accepted, in the effort of avoiding solutions to dwell on local minimums.
 
 \subsection{Antcol}
 
@@ -90,32 +92,32 @@ This paper is comprised of several experiments:
   \item Assessing Antcol and tuning hyperparameters in both non-cooperative and cooperative modes. Notably, tuning the evaporation rate and number of ants used to approximate a solution.
 \end{itemize}
 
-The source code is available in this project. It was written using a standard Java console application with Gradle for managing dependencies. The most important of those dependencies is JGraphT, an open source library for handling graphs. The graph format that was used is the popular DIMACS format. The graphs used in this project are listed in the appendix in Figure.
+The source code is available in this project. It was written using a standard Java console application with Gradle for managing dependencies. The most important of those dependencies is JGraphT, an open source library for handling graphs. The graph format that was used is the popular DIMACS format. Graphs used in this project are listed in the appendix in Table \ref{tab:graphs}.
 
 \subsection{Cooperative Metropolis Algorithm}
 
-The first experiment was assessing whether we could get better results for Metropolis using multiple threads running different parameters and multiple threads sharing information about what the lowest $k$ currently available is. Results from this experiment are captured in the appendix in Figure \ref{fig:metr1}. Noticeable difference in the minimum coloring achievable can be observed. Still, this approach did not yield any significant advances over using different algorithms such as Tabucol and PartialCol, whose results are discussed below.
+The first experiment was assessing whether results for the Metropolis algorithm could be improved using multiple threads running different parameters and sharing information about what the lowest $k$ currently available is. Results from this experiment are captured in the appendix in Figure \ref{fig:metr1}. Noticeable difference in the minimum coloring achievable can be observed. Still, this approach did not yield any significant advances over using different algorithms such as Tabucol and PartialCol, whose results are discussed below.
 
 \subsection{Cooperative Tabucol Algorithm}
 
-The results in Figure \ref{fig:TabuColl} were intended to provide discussion with reference towards \cite{https://doi.org/10.5445/ir/1000083192}. We did find that the portfolio approach decreased the error on our optimal coloring determinations. However, we were fairly surprised that the statistic matrix approach did not yield significant benefits (in fact, it appeared detrimental). Some possible explanations were listed in the PartialCol section.
+The results in Figure \ref{fig:TabuColl} were intended to provide discussion with reference towards \cite{https://doi.org/10.5445/ir/1000083192}. It was found that the portfolio approach decreased the error on our optimal coloring determinations. However, the statistic matrix approach did not yield significant benefits (and appeared, in fact, detrimental). Possible explanations are listed in the PartialCol section.
 
 \subsection{Cooperative PartialCol Algorithm}
 
-The third experiment performed was analyzing the use of cooperative approaches and the statistic matrix for PartialCol. Again, the surprising result was that the statistic matrix didn't provide any inherent benefit over the standard cooperative approaches or the multithreaded simple portfolio approach. In fact, it performed worse in our experiments. See the average error in Figure \ref{fig:partialcol}.
-One possibility is that the implementation by Li had a different synchronization method. Ours was synchronized in access, but not in terms of iterations. Our approach determined that the best approach was simply using a portfolio approach to minimize the odds getting stuck in local minima, as the cooperative approach didn't provide too much overhead.
+The third experiment performed was analyzing the use of cooperative approaches and the statistic matrix for PartialCol. The results echoed those from Tabucol in that the statistic matrix did not provide any inherent benefit over the standard cooperative approaches or the multithreaded simple portfolio approach. The experiments performed showed a hinderance in performance instead. See the average error in Figure \ref{fig:partialcol}.
+One possibility is that the implementation by Li had a different synchronization method. The implementation for this project was synchronized in access, but not in terms of iterations. The approach presented simply utilizes a portfolio approach to minimize the odds getting stuck in local minima, as the cooperative approach did not provide too much overhead.
 
 \subsection{Antcol}
 
-The final experiment performed was assessing Antcol and its hyperparameters: notably, if tuning the number of ants or the evaporation rate of the pheromone matrix would increase or decrease the optimal approximation. The average error for the hyperparameters that were included in \cite{10.5555/2851123} was approximately 0.18. This implementation included an evaporation rate of 0.75. When adjusting this to be higher or lower, we can see based on the graph in \ref{fig:antcol} that lower values of evaporation tended to cater towards lower errors. Specifically, performance for smaller known-colorings proved to reach the optimal coloring. When we experimented using a shared dataset across multiple instances of Antcol, we noticed that the error increased in size. This is likely due to the somewhat random, sequential nature of how Antcol works. Because each individual contribution ends up contributing to the global matrix for each instance, it is possible that a solution set may differ than that of another. While the difference in average error is small, it's worth noting that both increasing the number of ants and lowering evaporation rates improved optimality at an expense in computational effort.
+The final experiment performed was assessing Antcol and its hyperparameters: notably, if tuning the number of ants or the evaporation rate of the pheromone matrix would increase or decrease the optimal approximation. The average error for the hyperparameters that were included in \cite{10.5555/2851123} was approximately 0.18. This implementation included an evaporation rate of 0.75. When adjusting this to be higher or lower, we can see based on the graph in Figure \ref{fig:antcol} that lower values of evaporation tended to cater towards lower errors. Specifically, performance for smaller known-colorings proved to reach the optimal coloring. When we experimented using a shared dataset across multiple instances of Antcol, we noticed that the error increased in size. This is likely due to the somewhat random, sequential nature of how Antcol works. Because each individual contribution ends up contributing to the global matrix for each instance, it is possible that a solution set may differ than that of another. While the difference in average error is small, it's worth noting that both increasing the number of ants and lowering evaporation rates improved optimality at an expense in computational effort.
 
 \section{Conclusion}
-In this report we examined several different cooperative approaches to various local search algorithms. In addition, we leveraged the novel approach of Li and extended it to the PartialCol algorithm. For the evaluated graphs, no noticeable advantages were identified, and distinct disadvantages in terms of average error were observed instead. For all the algorithms, however, we did see benefit in the portfolio approach. Several other approaches were evaluated (a simple evolutionary algorithm), but we found that they were not performant enough to be viable).
+In this report we examined several different cooperative approaches to various local search algorithms. In addition, we leveraged the novel approach of Li and extended it to the PartialCol algorithm. For the evaluated graphs, no noticeable advantages were identified, and distinct disadvantages in terms of average error were observed instead. For all the algorithms, however, the portfolio approach seemed to provide improvements. Several other approaches were evaluated (for instance, a simple evolutionary algorithm), but it was found that they did not performed well enough to be viable).
 
 
-\section{Appendix}
+\section{Appendix A. Graph Coloring Algorithms Evaluation Results}
 
-The graphs used are shown below. Optimal is Approximate denotes whether we know a lower bound for said graph.
+The following list is the collection of graphs used to evaluate the algorithms described in this paper. ``Optimal is Approximate" denotes whether we know a lower bound for said graph.
 
 \begin{longtable}{|l|l|l|l|l|}
   \hline
@@ -144,38 +146,58 @@ The graphs used are shown below. Optimal is Approximate denotes whether we know 
   T          & 28               & r250.5         & 250      & 14849 \\ \hline
   F          & 14               & school1\_nsh   & 352      & 14612 \\ \hline
   F          & 14               & school1        & 385      & 19095 \\ \hline
+\caption{\label{tab:graphs}Collection of graphs used in the project.}
 \end{longtable}
 
 Note that multithreaded experiments were run with 8 threads. The notation $a[x,y]$ means that parameter $a$ was chosen with arbitrary values between $x$ and $y$. In lieu of $\alpha$ and $\beta$, a and b were used.
 
-\begin{figure}[h]
+Figures \ref{fig:metr1} through \ref{fig:antcol} show accuracy performance for the different algorithms evaluated.
+
+\begin{figure}[!h]
   \centering
   \includegraphics[width=1.125\textwidth]{Metropolis.png}
   \caption{Metropolis Results}
   \label{fig:metr1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
   \includegraphics[width=1\textwidth]{Tabucol.png}
   \caption{Tabucol Results}
   \label{fig:TabuColl}
 \end{figure}
 
-
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
   \includegraphics[width=1\textwidth]{PartialCol.png}
   \caption{PartialCol Results}
   \label{fig:partialcol}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
   \includegraphics[width=1\textwidth]{AntCol.png}
   \caption{AntCol Results}
   \label{fig:antcol}
 \end{figure}
+
+\clearpage
+\section{Appendix B. Coloring Initialization Comparison}[h]
+While reviewing literature for the experiments presented in this paper, it was observed that certain authors would use different initial values for their coloring. As a side experiment, a brief comparison was made between a few of the initialization options presented. The initialization schemes compared were denominated simple-ordered, random, and unassigned-neighbor strategies.
+The simple-ordered strategy is the general case of the initialization presented in the Central Algorithm section. Vertex are assigned a coloring in an orderly fashion from 1 to $k$, and colors are cycled over until all vertex have a color. The random strategy is self-explanatory, each vertex gets assigned a color from 1 to $k$ randomly with a uniform distribution. The last strategy, unassigned-neighbor, tries to exploit lightly connected graphs, by initializing all vertices to an $uncolored$ state.
+This strategy first assigns a root vertex to color 1 and then traverses the graph, coloring each uncolored vertex found with color 1 should it not share an edge with a vertex of that color. Once the traversal is completed, a vertex from the uncolored vertex set is colored with color 2, and a new traversal begins, comparing neighbors to new color as the metric for coloring vertices. This process is repeated for all $k$ colors. The scenario that some vertices are left uncolored after the strategy is completed is high, particularly on heavily connected graphs, and the remaining uncolored vertices will be assigned randomly.\\
+
+For the comparison experiment, it was decided to use the Metropolis algorithm due to the simplicity of the implementation of the benchmark for a proof-of-concept test. Results are shown in \ref{fig:seeding}.
+
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=1\textwidth]{Seeding_error.png}
+  \caption{Average error for different graph initialization strategies}
+  \label{fig:seeding}
+\end{figure}
+
+While results vary slightly, it was concluded that no one seeding strategy yielded significantly better results than the rest, so a single strategy was used for the evaluation of algorithms in the main portion of the project.
 
 
 \clearpage
