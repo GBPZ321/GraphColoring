@@ -51,6 +51,30 @@ public class MetropolisExperiment {
             case "6":
                 experimentSix();
                 break;
+            case "7":
+                experimentSeven();
+                break;
+            case "8":
+                experimentEight();
+                break;
+            case "9":
+                experimentNine();
+                break;
+            case "10":
+                experimentTen();
+                break;
+            case "11":
+                experimentEleven();
+                break;
+            case "12":
+                experimentTwelve();
+                break;
+            case "13":
+                experimentThirteen();
+                break;
+            case "14":
+                experimentFourteen();
+                break;
         }
         System.exit(0);
     }
@@ -159,6 +183,144 @@ public class MetropolisExperiment {
         List<Integer> k = new ArrayList<>();
         for(String filename : files) {
             runMulithreadedExperiment(threads, k, filename, .5, 1.5, true, MetropolisSeedingStrategy.SIMPLE_ORDERED);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+
+    private static void experimentSeven() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Mulithreaded [8] metropolis algorithm for various graphs with neighbor expansion.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .95, 1, false, MetropolisSeedingStrategy.UNCOLORED_NEIGHBOR);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentEight() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Tighter bound metropolis [4] algorithm for various graphs with cooperation with neighbor expansion.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .97, .99, true, MetropolisSeedingStrategy.UNCOLORED_NEIGHBOR);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentNine() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Even tighter bound metropolis [5] algorithm for various graphs with cooperation with neighbor expansion.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .98, .99, true, MetropolisSeedingStrategy.UNCOLORED_NEIGHBOR);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentTen() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Looser bound metropolis [4] algorithm for various graphs with cooperation with neighbor expansion.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .95, 1, true, MetropolisSeedingStrategy.UNCOLORED_NEIGHBOR);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+
+    private static void experimentEleven() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = " Random Mulithreaded [8] metropolis algorithm for various graphs.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .95, 1, false, MetropolisSeedingStrategy.RANDOM);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentTwelve() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Random Tighter bound metropolis [4] algorithm for various graphs with cooperation.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .97, .99, true, MetropolisSeedingStrategy.RANDOM);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentThirteen() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Random Even tighter bound metropolis [5] algorithm for various graphs with cooperation.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .98, .99, true, MetropolisSeedingStrategy.RANDOM);
+        }
+        for(int kz : k) {
+            System.out.println(kz);
+        }
+    }
+
+    private static void experimentFourteen() throws IOException, InterruptedException, ExecutionException {
+        String experimentLabel = "Random Looser bound metropolis [4] algorithm for various graphs with cooperation.";
+        System.out.println(experimentLabel);
+        System.out.println(header);
+
+        int threads = 8;
+
+        List<String> files = getListOfGraphs();
+        List<Integer> k = new ArrayList<>();
+        for(String filename : files) {
+            runMulithreadedExperiment(threads, k, filename, .95, 1, true, MetropolisSeedingStrategy.RANDOM);
         }
         for(int kz : k) {
             System.out.println(kz);
